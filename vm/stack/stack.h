@@ -9,8 +9,8 @@
 // #define NSTKDEBUG
 
 // значения которые по сути и задают полное поведение стэка
-#define STACK_EL_TYPE double
-#define STACK_EL_SPECIFICATOR "%lg"
+#define STACK_EL_TYPE long long
+#define STACK_EL_SPECIFICATOR "%lld"
 
 // комбинация 2 обертки + переменная для прокидывания именно
 // значения макроса STACK_EL_TYPE как строки
@@ -27,7 +27,7 @@
 
 // логирование стэка
 #ifndef NSTKDEBUG
-#define stklog(message, ...) flog(message, ##__VA_ARGS__)
+#define stklog(message, ...) FLOG(message, ##__VA_ARGS__)
 #else
 #define stklog(message, ...)
 #endif

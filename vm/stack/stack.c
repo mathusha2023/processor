@@ -1,5 +1,6 @@
 #include "stack.h"
 #include <assert.h>
+#include <math.h>
 #include <stdlib.h>
 #include "config.h"
 #include "log.h"
@@ -12,7 +13,6 @@ static int need_stack_reduce(Stack *stk);
 // функции используемые только при работе в режиме отладки
 #ifndef NSTKDEBUG
 
-static double my_fabs(double x);
 static int is_equal(double a, double b);
 void check_canary_alive(Stack *stk);
 static const char *get_str_canary_status(stack_el_t canary);
@@ -575,28 +575,28 @@ void check_canary_alive(Stack *stk)
 
     if (stk->canary_left != STRUCT_CANARY_CONST)
     {
-        log("FATAL ERROR: left stack canary is died!!");
+        LOG("FATAL ERROR: left stack canary is died!!");
         dump_stack(stk);
         abort();
     }
 
     if (stk->canary_right != STRUCT_CANARY_CONST)
     {
-        log("FATAL ERROR: right stack canary is died!!");
+        LOG("FATAL ERROR: right stack canary is died!!");
         dump_stack(stk);
         abort();
     }
 
     if (!is_equal((double)stk->data[0], (double)CANARY_CONST))
     {
-        log("FATAL ERROR: left data canary is died!!");
+        LOG("FATAL ERROR: left data canary is died!!");
         dump_stack(stk);
         abort();
     }
 
     if (!is_equal((double)stk->data[stk->right_data_canary_index], (double)CANARY_CONST))
     {
-        log("FATAL ERROR: right data canary is died!!");
+        LOG("FATAL ERROR: right data canary is died!!");
         dump_stack(stk);
         abort();
     }
@@ -628,14 +628,9 @@ static size_t get_stack_hash(Stack *stk)
     return h;
 }
 
-static double my_fabs(double x)
-{
-    return x > 0 ? x : -x;
-}
-
 static int is_equal(double a, double b)
 {
-    return my_fabs(a - b) < EPSILON;
+    return fabs(a - b) < EPSILON;
 }
 
 #endif // NSTKDEBUG
