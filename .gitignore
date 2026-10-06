@@ -1,0 +1,9 @@
+.idea
+*.out
+*.dSYM
+log.txt
+.vscode
+TODO.md
+.VSCodeCounter
+vm/vm
+assembler/assembler
