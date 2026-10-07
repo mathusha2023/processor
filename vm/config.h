@@ -23,4 +23,9 @@
 const char LOGFILE_NAME[] = "log.txt";
 const double EPSILON = 1e-6;
 
+// фиксированная точность вычислений
+const long long DELTA = 10000;
+
+const size_t MAX_COMMAND_LENGTH = 100;
+
 #endif // CONFIG_H

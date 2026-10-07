@@ -71,6 +71,9 @@ ExecutorError eadd(void)
     if (error.stack_error != STACK_OK)
     {
         LOG("Error in stack popping second value : %s", get_stack_error(error.stack_error));
+
+        // вернуть на место забранный ранее y
+        push_stack(&stack, y);
         return error;
     }
 
@@ -104,6 +107,9 @@ ExecutorError esub(void)
     if (error.stack_error != STACK_OK)
     {
         LOG("Error in stack popping second value : %s", get_stack_error(error.stack_error));
+
+        // вернуть на место забранный ранее y
+        push_stack(&stack, y);
         return error;
     }
 
@@ -136,6 +142,9 @@ ExecutorError emult(void)
     if (error.stack_error != STACK_OK)
     {
         LOG("Error in stack popping second value : %s", get_stack_error(error.stack_error));
+
+        // вернуть на место забранный ранее y
+        push_stack(&stack, y);
         return error;
     }
 
@@ -170,6 +179,9 @@ ExecutorError ediv(void)
     {
         error.executor_error = EXECUTOR_DIVISION_BY_ZERO;
         LOG("Error: division by zero!");
+
+        // вернуть на место забранный ранее y
+        push_stack(&stack, y);
         return error;
     }
 
@@ -177,6 +189,9 @@ ExecutorError ediv(void)
     if (error.stack_error != STACK_OK)
     {
         LOG("Error in stack popping second value : %s", get_stack_error(error.stack_error));
+
+        // вернуть на место забранный ранее y
+        push_stack(&stack, y);
         return error;
     }
 
@@ -273,4 +288,9 @@ ExecutorError eout(void)
     dump_stack(&stack);
 
     return error;
+}
+
+const char *get_exec_error(ExecError error)
+{
+    return STR_EXEC_ERRORS[error];
 }
