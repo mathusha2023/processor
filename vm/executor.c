@@ -248,6 +248,16 @@ ExecutorError esqrt(void)
         return error;
     }
 
+    if (x < 0)
+    {
+        error.executor_error = EXECUTOR_SQRT_FROM_NEGATIVE_NUMBER;
+        LOG("Error: square root from negative number!");
+
+        // вернуть на место забранный ранее x
+        push_stack(&stack, x);
+        return error;
+    }
+
     x = (stack_el_t)(DELTA * sqrt((double)x / DELTA));
 
     error.stack_error = push_stack(&stack, x);

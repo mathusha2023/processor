@@ -6,5 +6,7 @@ log.txt
 TODO.md
 .VSCodeCounter
 vm/vm
+assembler/asm
 assembler/assembler
 program.txt
+*.baa

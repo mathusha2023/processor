@@ -7,11 +7,13 @@ typedef enum ExecError
 {
     EXECUTOR_OK,
     EXECUTOR_DIVISION_BY_ZERO,
+    EXECUTOR_SQRT_FROM_NEGATIVE_NUMBER
 } ExecError;
 
 static const char *STR_EXEC_ERRORS[] = {
     "EXECUTOR_OK",
     "EXECUTOR_DIVISION_BY_ZERO",
+    "EXECUTOR_SQRT_FROM_NEGATIVE_NUMBER",
 };
 
 // ограничения - 32 значения StackError и 8 значений ExecError

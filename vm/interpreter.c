@@ -89,6 +89,8 @@ InterpreterError process_one_command(void)
 
 enum Commands get_command(char *command)
 {
+    assert(command);
+
     if (strcmp(command, "HLT") == 0)
         return C_HLT;
     else if (strcmp(command, "PUSH") == 0)
@@ -121,6 +123,8 @@ const char *get_interpreter_error(InterpreterError error)
 
 static InterpreterError execute_void_command(int sscanf_res, ExecutorError (*command)(void))
 {
+    assert(command);
+
     if (sscanf_res != 1)
     {
         LOG("Incorrect command format: invalid args count: need 0");
@@ -145,6 +149,8 @@ static InterpreterError execute_void_command(int sscanf_res, ExecutorError (*com
 
 static InterpreterError execute_one_arg_command(int sscanf_res, ExecutorError (*command)(stack_el_t arg), stack_el_t arg)
 {
+    assert(command);
+
     if (sscanf_res != 2)
     {
         LOG("Incorrect command format: invalid args count: need 1");
