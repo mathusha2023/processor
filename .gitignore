@@ -10,3 +10,4 @@ assembler/asm
 assembler/assembler
 program.txt
 *.baa
+*.baa.txt

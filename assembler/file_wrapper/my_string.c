@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <ctype.h>
 #include "log.h"
 #include "file_wrapper.h"
 
@@ -23,6 +24,19 @@ int lines_count(const char *str)
     assert(str);
 
     return chrcount(str, '\n') + 1;
+}
+
+int is_space_string(const char *str)
+{
+    assert(str);
+
+    while (*str)
+    {
+        if (!isspace(*str))
+            return 0;
+        str++;
+    }
+    return 1;
 }
 
 // устанавливает поля wrapper->strings и wrapper->strings_count

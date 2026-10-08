@@ -10,5 +10,6 @@ int read_text(const char *filename, char *buffer, size_t length, size_t *read_si
 int write_text(const char *filename, const char *line, const char *mode);
 int write_string(const char *filename, struct String *str, const char *mode);
 int write_strings(const char *filename, struct String *strings, size_t length, const char *mode);
+int write_bin(const char *filename, void *arr, size_t el_size, size_t arr_size);
 
 #endif // FILES_H

@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
 
     const char *input_file_name = cmd_args.INPUT_FILE_NAME ? cmd_args.INPUT_FILE_NAME : DEFAULT_INPUT_FILE_NAME;
     const char *output_file_name = cmd_args.OUTPUT_FILE_NAME ? cmd_args.OUTPUT_FILE_NAME : DEFAULT_OUTPUT_FILE_NAME;
+    const char *output_debug_file_name = DEFAULT_DEBUG_OUTPUT_FILE_NAME;
 
     flog("Input file name: '%s'", input_file_name);
     flog("Output file name: '%s'", output_file_name);
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
         return wrapper.error;
     }
 
-    if (asm_data(&wrapper, output_file_name))
+    if (asm_data(&wrapper, output_file_name, output_debug_file_name))
     {
         log("Can not assemble data from file((");
         wrapper.dispose(&wrapper);

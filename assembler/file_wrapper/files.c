@@ -167,3 +167,28 @@ int write_string(const char *filename, struct String *str, const char *mode)
     fclose(file);
     return 0;
 }
+
+int write_bin(const char *filename, void *arr, size_t el_size, size_t arr_size)
+{
+    assert(filename);
+    assert(arr);
+
+    FILE *file = fopen(filename, "wb");
+    if (file == NULL)
+    {
+        int error = errno;
+        log("Cant open file %s: %d", filename, error);
+        return errno;
+    }
+
+    size_t written = fwrite(arr, el_size, arr_size, file);
+    if (written != arr_size)
+    {
+        int error = errno;
+        log("Error while writing data in file %s: %d", filename, error);
+        return error;
+    }
+
+    fclose(file);
+    return 0;
+}

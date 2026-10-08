@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <math.h>
 #include "stack/stack.h"
+#include "config.h"
 #include "log.h"
 
 static Stack stack = {};
@@ -287,12 +288,6 @@ ExecutorError eout(void)
     }
 
     printf("%lg\n", (double)value / DELTA);
-
-    error.stack_error = push_stack(&stack, value);
-    if (error.stack_error != STACK_OK)
-    {
-        LOG("Error in stack pushing: %s", get_stack_error(error.stack_error));
-    }
 
     FLOG("After out:");
     dump_stack(&stack);

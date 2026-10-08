@@ -13,6 +13,7 @@ struct String
 
 int chrcount(const char *str, char c);
 int lines_count(const char *str);
+int is_space_string(const char *str);
 int make_strings_arr(struct FileWrapper *wrapper);
 
 #endif // MY_STRINGS_H
