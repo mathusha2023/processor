@@ -1,8 +1,7 @@
 #ifndef ASM_TABLE_H
 #define ASM_TABLE_H
 
-#include <stdlib.h>
-#include "assembler.h"
+#include <stddef.h>
 
 enum Commands
 {
@@ -10,7 +9,7 @@ enum Commands
     PUSH_NUMBER = 1,
     ADD = 2,
     SUB = 3,
-    MULT = 4,
+    MUL = 4,
     DIV = 5,
     ABS = 6,
     SQRT = 7,
@@ -45,8 +44,8 @@ const static struct Command commands[N_COMMANDS] = {
      .cmd_str = "SUB",
      .cmd_args_count = 0},
 
-    {.cmd_num = MULT,
-     .cmd_str = "MULT",
+    {.cmd_num = MUL,
+     .cmd_str = "MUL",
      .cmd_args_count = 0},
 
     {.cmd_num = DIV,

@@ -23,23 +23,24 @@ typedef struct ExecutorError
     ExecError executor_error : 3;
 } ExecutorError;
 
-const size_t START_STACK_CAPACITY = 20;
+// структура из vm.h, сам файл не инклудится из за ошибок включения
+struct VM;
 
 // API для взаимодействия с процессором
-ExecutorError einit(void);
-ExecutorError ehlt(void);
+ExecutorError einit(VM *vm);
+ExecutorError ehlt(VM *vm);
 
-ExecutorError epush(stack_el_t value);
+ExecutorError epush(VM *vm, stack_el_t value);
 
-ExecutorError eadd(void);
-ExecutorError esub(void);
-ExecutorError emult(void);
-ExecutorError ediv(void);
+ExecutorError eadd(VM *vm);
+ExecutorError esub(VM *vm);
+ExecutorError emul(VM *vm);
+ExecutorError ediv(VM *vm);
 
-ExecutorError eabs(void);
-ExecutorError esqrt(void);
+ExecutorError eabs(VM *vm);
+ExecutorError esqrt(VM *vm);
 
-ExecutorError eout(void);
+ExecutorError eout(VM *vm);
 
 const char *get_exec_error(ExecError error);
 
