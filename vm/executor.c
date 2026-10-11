@@ -342,6 +342,17 @@ ExecutorError epush_register(VM *vm)
     return error;
 }
 
+ExecutorError ejmp(VM *vm)
+{
+    assert(vm);
+    assert(0 <= vm->current_command.arg1 && (size_t)vm->current_command.arg1 < vm->code_length);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    vm->IP = (size_t)vm->current_command.arg1;
+    return error;
+}
+
 const char *get_exec_error(ExecError error)
 {
     return STR_EXEC_ERRORS[error];

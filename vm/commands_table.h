@@ -16,6 +16,7 @@ enum Commands
     OUT = 8,
     POP = 9,
     PUSH_REGISTER = 10,
+    JMP = 11,
 };
 
 struct Command
@@ -26,7 +27,7 @@ struct Command
     long long arg2;
 };
 
-const size_t N_COMMANDS = 11;
+const size_t N_COMMANDS = 12;
 
 /*
 Массив структур нужен по сути для того, чтобы легко получать количество аргументов каждой команды.
@@ -46,6 +47,7 @@ const static struct Command commands[N_COMMANDS] = {
     {.cmd = OUT},
     {.cmd = POP, .cmd_args_count = 1},
     {.cmd = PUSH_REGISTER, .cmd_args_count = 1},
+    {.cmd = JMP, .cmd_args_count = 1},
 };
 
 #endif // COMMANDS_TABLE_H

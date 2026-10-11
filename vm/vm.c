@@ -143,6 +143,8 @@ ExecutorError execute_command(VM *vm)
         return epop(vm);
     case PUSH_REGISTER:
         return epush_register(vm);
+    case JMP:
+        return ejmp(vm);
     default:
         LOG("ERROR: unknown command while casing executing command");
         assert(0 && "ПРОИЗОШЕЛ ПОЛНЫЙ БЛЯЗДЕЦ");

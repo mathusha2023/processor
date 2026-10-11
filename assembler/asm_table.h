@@ -16,6 +16,7 @@ enum Commands
     OUT = 8,
     POP = 9,
     PUSH_REGISTER = 10,
+    JMP = 11,
 
     UNKNOWN = 1488,
 };
@@ -36,7 +37,7 @@ struct Command
     const enum ArgTypes arg2_type;
 };
 
-const size_t N_COMMANDS = 11;
+const size_t N_COMMANDS = 12;
 
 const static struct Command commands[N_COMMANDS] = {
     {
@@ -106,6 +107,13 @@ const static struct Command commands[N_COMMANDS] = {
         .cmd_str = "PUSH",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_REGISTER,
+    },
+
+    {
+        .cmd_num = JMP,
+        .cmd_str = "JMP",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_INT,
     },
 };
 

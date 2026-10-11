@@ -45,6 +45,8 @@ ExecutorError eout(VM *vm);
 ExecutorError epop(VM *vm);
 ExecutorError epush_register(VM *vm);
 
+ExecutorError ejmp(VM *vm);
+
 const char *get_exec_error(ExecError error);
 
 #endif // EXECUTOR_H
