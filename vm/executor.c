@@ -7,6 +7,8 @@
 
 ExecutorError ehlt(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
     error.stack_error = destroy_stack(&vm->stack);
@@ -21,8 +23,12 @@ ExecutorError ehlt(VM *vm)
     return error;
 }
 
-ExecutorError epush(VM *vm, stack_el_t value)
+ExecutorError epush_number(VM *vm)
 {
+    assert(vm);
+
+    long long value = vm->current_command.arg1;
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
     error.stack_error = push_stack(&vm->stack, value * DELTA);
@@ -39,9 +45,11 @@ ExecutorError epush(VM *vm, stack_el_t value)
 
 ExecutorError eadd(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    stack_el_t x = 0, y = 0;
+    long long x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -74,10 +82,12 @@ ExecutorError eadd(VM *vm)
 
 ExecutorError esub(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
     // x лежит выше в стэке, то есть положен туда раньше
-    stack_el_t x = 0, y = 0;
+    long long x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -110,9 +120,11 @@ ExecutorError esub(VM *vm)
 
 ExecutorError emul(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    stack_el_t x = 0, y = 0;
+    long long x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -146,10 +158,12 @@ ExecutorError emul(VM *vm)
 
 ExecutorError ediv(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
     // x лежит выше в стэке, то есть положен туда раньше
-    stack_el_t x = 0, y = 0;
+    long long x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -192,9 +206,11 @@ ExecutorError ediv(VM *vm)
 
 ExecutorError eabs(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    stack_el_t x = 0;
+    long long x = 0;
 
     error.stack_error = pop_stack(&vm->stack, &x);
     if (error.stack_error != STACK_OK)
@@ -220,9 +236,11 @@ ExecutorError eabs(VM *vm)
 
 ExecutorError esqrt(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    stack_el_t x = 0;
+    long long x = 0;
 
     error.stack_error = pop_stack(&vm->stack, &x);
     if (error.stack_error != STACK_OK)
@@ -241,7 +259,7 @@ ExecutorError esqrt(VM *vm)
         return error;
     }
 
-    x = (stack_el_t)(DELTA * sqrt((double)x / DELTA));
+    x = (long long)(DELTA * sqrt((double)x / DELTA));
 
     error.stack_error = push_stack(&vm->stack, x);
     if (error.stack_error != STACK_OK)
@@ -258,9 +276,11 @@ ExecutorError esqrt(VM *vm)
 // распечатать верхнее значение в стеке
 ExecutorError eout(VM *vm)
 {
+    assert(vm);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    stack_el_t value = 0;
+    long long value = 0;
 
     error.stack_error = pop_stack(&vm->stack, &value);
     if (error.stack_error != STACK_OK)
@@ -272,6 +292,51 @@ ExecutorError eout(VM *vm)
     printf("%lg\n", (double)value / DELTA);
 
     FLOG("After out:");
+    dump_stack(&vm->stack);
+
+    return error;
+}
+
+ExecutorError epop(VM *vm)
+{
+    assert(vm);
+
+    long long register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    long long value = 0;
+
+    error.stack_error = pop_stack(&vm->stack, &value);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack popping value: %s", get_stack_error(error.stack_error));
+    }
+    vm->registers[register_num] = value;
+
+    FLOG("After pop:");
+    dump_stack(&vm->stack);
+
+    return error;
+}
+
+ExecutorError epush_register(VM *vm)
+{
+    assert(vm);
+
+    long long register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    error.stack_error = push_stack(&vm->stack, vm->registers[register_num]);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", vm->registers[register_num], get_stack_error(error.stack_error));
+    }
+
+    FLOG("After push register:");
     dump_stack(&vm->stack);
 
     return error;

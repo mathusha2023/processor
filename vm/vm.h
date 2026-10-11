@@ -6,6 +6,9 @@
 #include "executor.h"
 #include "config.h"
 
+const size_t START_STACK_CAPACITY = 20;
+const size_t REGISTERS_COUNT = 8;
+
 typedef enum VirtualMachineError
 {
     VM_OK,
@@ -32,14 +35,14 @@ typedef struct VMError
 
 typedef struct VM
 {
-    stack_el_t code[MAX_CODE_LENGTH];
+    long long code[MAX_CODE_LENGTH];
     size_t code_length;
     Stack stack;
+    size_t registers_count;
+    long long registers[REGISTERS_COUNT];
     size_t IP;
     struct Command current_command;
 } VM;
-
-const size_t START_STACK_CAPACITY = 20;
 
 VMError init_vm(VM *vm);
 VMError load_program(VM *vm, const char *filename);

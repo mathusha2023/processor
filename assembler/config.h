@@ -29,5 +29,6 @@ const char LOGFILE_NAME[] = "log.txt";
 
 const size_t MAX_COMMAND_LENGTH = 100;
 const size_t MAX_CODE_LENGTH = 1000;
+const size_t MAX_COMMAND_ARG_LENGTH = 30;
 
 #endif // CONFIG_H

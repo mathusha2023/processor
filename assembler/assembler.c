@@ -10,7 +10,10 @@
 #include "log.h"
 
 static enum ProcessStringError process_string(struct String *string, struct IR *ir);
-static struct Command get_command(char *command);
+static struct Command get_command(const char *command);
+static int parse_command_args(struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2);
+static int parse_command_arg(enum ArgTypes arg_type, const char *str_arg, int *arg);
+static int get_register(const char *str_register);
 static int write_ir_to_buffer(char *buffer, size_t buffer_size, struct IR *ir);
 
 int asm_data(struct FileWrapper *file, const char *output_file_name, const char *output_debug_file_name)
@@ -63,13 +66,20 @@ int asm_data(struct FileWrapper *file, const char *output_file_name, const char 
             return _error;
         }
 
+        assert(code_index < MAX_CODE_LENGTH);
         code[code_index++] = ir.cmd;
 
         if (ir.cmd_args_count > 0)
+        {
+            assert(code_index < MAX_CODE_LENGTH);
             code[code_index++] = ir.arg1;
+        }
 
         if (ir.cmd_args_count > 1)
+        {
+            assert(code_index < MAX_CODE_LENGTH);
             code[code_index++] = ir.arg2;
+        }
     }
 
     fclose(output_file);
@@ -93,6 +103,7 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
     char real_string[MAX_COMMAND_LENGTH] = {};
 
     char str_command[MAX_COMMAND_LENGTH] = {};
+    char str_arg1[MAX_COMMAND_ARG_LENGTH] = {}, str_arg2[MAX_COMMAND_ARG_LENGTH] = {};
     int arg1 = 0, arg2 = 0;
 
     // записываем в real_string ровно столько символов, сколько лежат в string->length (+ \0)
@@ -107,7 +118,7 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
         return PSE_EMPTY_STRING;
     }
 
-    int res = sscanf(real_string, "%s %d %d", str_command, &arg1, &arg2);
+    int res = sscanf(real_string, "%s %s %s", str_command, str_arg1, str_arg2);
 
     if (res < 1)
     {
@@ -124,19 +135,26 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
 
     if (res - 1 != (int)command.cmd_args_count)
     {
-        log("%s: invalid arguments count: waited %lu, got %d", command.cmd_str, command.cmd_num, res - 1);
+        log("%s: invalid arguments count: waited %lu, got %d", command.cmd_str, command.cmd_args_count, res - 1);
         return PSE_INVALID_ARGS;
     }
 
     ir->cmd = command.cmd_num;
     ir->cmd_args_count = command.cmd_args_count;
+
+    if (parse_command_args(&command, str_arg1, str_arg2, &arg1, &arg2))
+    {
+        log("Error while parsing command args!");
+        return PSE_INVALID_ARGS;
+    }
+
     ir->arg1 = arg1;
     ir->arg2 = arg2;
 
     return PSE_OK;
 }
 
-static struct Command get_command(char *command)
+static struct Command get_command(const char *command)
 {
     assert(command);
 
@@ -151,6 +169,91 @@ static struct Command get_command(char *command)
     log("Got unknown command: %s", command);
 
     return (struct Command){.cmd_num = UNKNOWN, .cmd_str = "", .cmd_args_count = 0};
+}
+
+static int parse_command_args(struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2)
+{
+    assert(command);
+    assert(str_arg1);
+    assert(str_arg2);
+    assert(arg1);
+    assert(arg2);
+
+    if (command->cmd_args_count == 0)
+        return 0;
+
+    if (command->cmd_args_count > 0)
+    {
+        int res = parse_command_arg(command->arg1_type, str_arg1, arg1);
+        if (res)
+        {
+            log("Error while parsing command %s arg1 %s", command->cmd_str, str_arg1);
+            return res;
+        }
+    }
+    if (command->cmd_args_count > 1)
+    {
+        int res = parse_command_arg(command->arg2_type, str_arg2, arg2);
+        if (res)
+        {
+            log("Error while parsing command %s arg1 %s", command->cmd_str, str_arg2);
+            return res;
+        }
+    }
+
+    return 0;
+}
+
+static int parse_command_arg(enum ArgTypes arg_type, const char *str_arg, int *arg)
+{
+    switch (arg_type)
+    {
+
+    case ATYPE_INT:
+    {
+        int res = sscanf(str_arg, "%d", arg);
+
+        if (res == 1)
+            break;
+
+        log("Cant parse INT arg from str_arg = %s", str_arg);
+        return 1;
+    }
+
+    case ATYPE_REGISTER:
+    {
+        int reg = get_register(str_arg);
+        if (reg < 0)
+        {
+            log("Get unknown register name: %s", str_arg);
+            return 1;
+        }
+        *arg = reg;
+        break;
+    }
+
+    default:
+        log("Unknown arg type: %d", arg_type);
+        return 1;
+    }
+
+    return 0;
+}
+
+// ВОЗМОЖЕН БАГ - НА КОНЦЕ str_register БУДЕТ ПЕРЕВОД СТРОКИ И СРАВНЕНИЕ НЕ СРАБОТАЕТ,
+// но это не точно)
+static int get_register(const char *str_register)
+{
+    assert(str_register);
+
+    for (size_t i = 0; i < REGISTERS_COUNT; i++)
+    {
+        if (!strcmp(str_register, REGISTERS[i]))
+            return (int)i;
+    }
+
+    log("Got unknown register: %s", str_register);
+    return -1;
 }
 
 // 1 если все плохо, 0 если все хорошо

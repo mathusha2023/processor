@@ -22,6 +22,18 @@ struct IR
     int arg2;
 };
 
+const size_t REGISTERS_COUNT = 8;
+static const char *REGISTERS[REGISTERS_COUNT] = {
+    "0X",
+    "AX",
+    "BX",
+    "CX",
+    "DX",
+    "EX",
+    "FX",
+    "GX",
+};
+
 int asm_data(struct FileWrapper *file, const char *output_file_name, const char *output_debug_file_name);
 
 #endif // ASSEMBLER_H

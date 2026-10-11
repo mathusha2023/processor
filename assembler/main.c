@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     wrapper.dispose(&wrapper);
 
-    log("Compilation successful! Output file saved ad '%s'", output_file_name);
+    log("Compilation successful! Output file saved as '%s'", output_file_name);
 
     return 0;
 }

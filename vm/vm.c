@@ -18,6 +18,7 @@ VMError init_vm(VM *vm)
     vm->IP = 0;
 
     error.stack_error = init_stack(&vm->stack, START_STACK_CAPACITY);
+    vm->registers_count = REGISTERS_COUNT;
 
     if (error.stack_error != STACK_OK)
     {
@@ -52,9 +53,9 @@ VMError load_program(VM *vm, const char *filename)
         return error;
     }
 
-    size_t code_length = (size_t)file_size / sizeof(stack_el_t);
+    size_t code_length = (size_t)file_size / sizeof(long long);
 
-    size_t read_count = fread(vm->code, sizeof(stack_el_t), min(code_length, MAX_CODE_LENGTH), file);
+    size_t read_count = fread(vm->code, sizeof(long long), min(code_length, MAX_CODE_LENGTH), file);
 
     if (read_count != code_length)
     {
@@ -99,10 +100,14 @@ VMError babah_vm(VM *vm)
 
     VMError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK, .vm_error = VM_OK};
 
-    error.stack_error = destroy_stack(&vm->stack);
-    if (error.stack_error)
+    if (is_stack_empty(&vm->stack) != STACK_OK)
     {
-        LOG("Error while destroing vm: %s", get_stack_error(error.stack_error));
+        error.stack_error = destroy_stack(&vm->stack);
+
+        if (error.stack_error)
+        {
+            LOG("Error while destroing vm: %s", get_stack_error(error.stack_error));
+        }
     }
 
     return error;
@@ -119,7 +124,7 @@ ExecutorError execute_command(VM *vm)
     case HLT:
         return ehlt(vm);
     case PUSH_NUMBER:
-        return epush(vm, vm->current_command.arg1);
+        return epush_number(vm);
     case ADD:
         return eadd(vm);
     case SUB:
@@ -129,11 +134,15 @@ ExecutorError execute_command(VM *vm)
     case DIV:
         return ediv(vm);
     case ABS:
-        return esqrt(vm);
+        return eabs(vm);
     case SQRT:
         return esqrt(vm);
     case OUT:
         return eout(vm);
+    case POP:
+        return epop(vm);
+    case PUSH_REGISTER:
+        return epush_register(vm);
     default:
         LOG("ERROR: unknown command while casing executing command");
         assert(0 && "ПРОИЗОШЕЛ ПОЛНЫЙ БЛЯЗДЕЦ");
@@ -148,10 +157,10 @@ const char *get_vm_error(VirtualMachineError error)
 
 void print_vm_error(VMError error)
 {
-    LOG("Stack error: %s\n, Executor error: %s\n, VM error: %s\n",
-        get_stack_error(error.stack_error),
-        get_exec_error(error.executor_error),
-        get_vm_error(error.vm_error));
+    LOG("ERROR HAPPENS:");
+    LOG("Stack error: %s", get_stack_error(error.stack_error));
+    LOG("Executor error: %s", get_exec_error(error.executor_error));
+    LOG("VM error: %s", get_vm_error(error.vm_error));
 }
 
 static struct Command get_next_command(VM *vm)

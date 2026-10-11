@@ -30,7 +30,7 @@ struct VM;
 ExecutorError einit(VM *vm);
 ExecutorError ehlt(VM *vm);
 
-ExecutorError epush(VM *vm, stack_el_t value);
+ExecutorError epush_number(VM *vm);
 
 ExecutorError eadd(VM *vm);
 ExecutorError esub(VM *vm);
@@ -41,6 +41,9 @@ ExecutorError eabs(VM *vm);
 ExecutorError esqrt(VM *vm);
 
 ExecutorError eout(VM *vm);
+
+ExecutorError epop(VM *vm);
+ExecutorError epush_register(VM *vm);
 
 const char *get_exec_error(ExecError error);
 
