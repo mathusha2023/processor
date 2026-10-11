@@ -10,7 +10,8 @@
 #include "log.h"
 
 static enum ProcessStringError process_string(struct String *string, struct IR *ir);
-static struct Command get_command(const char *command);
+static struct Command get_command(const char *command, const char *str_arg1, const char *str_arg2);
+int get_arg_type(const char *str_arg, enum ArgTypes *arg_type_buf);
 static int parse_command_args(struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2);
 static int parse_command_arg(enum ArgTypes arg_type, const char *str_arg, int *arg);
 static int get_register(const char *str_register);
@@ -126,10 +127,10 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
         return PSE_INCORRECT_INPUT;
     }
 
-    struct Command command = get_command(str_command);
+    struct Command command = get_command(str_command, str_arg1, str_arg2);
     if (command.cmd_num == UNKNOWN)
     {
-        log("Got unknown command: %s", str_command);
+        log("Got unknown command: %s (%s, %s)", str_command, str_arg1, str_arg2);
         return PSE_UNKNOWN_COMMAND;
     }
 
@@ -154,21 +155,65 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
     return PSE_OK;
 }
 
-static struct Command get_command(const char *command)
+static struct Command get_command(const char *command, const char *str_arg1, const char *str_arg2)
 {
     assert(command);
+    assert(str_arg1);
+    assert(str_arg2);
+
+    enum ArgTypes arg1_type = ATYPE_VOID, arg2_type = ATYPE_VOID;
+
+    if (get_arg_type(str_arg1, &arg1_type))
+    {
+        log("Get arg with unknown arg type: %s", str_arg1);
+        return (struct Command){.cmd_num = UNKNOWN, .cmd_str = "", .cmd_args_count = 0};
+    }
+    if (get_arg_type(str_arg2, &arg2_type))
+    {
+        log("Get arg with unknown arg type: %s", str_arg2);
+        return (struct Command){.cmd_num = UNKNOWN, .cmd_str = "", .cmd_args_count = 0};
+    }
 
     for (size_t i = 0; i < N_COMMANDS; i++)
     {
         struct Command cmd = commands[i];
 
-        if (!strcmp(command, cmd.cmd_str))
+        if (!strcmp(command, cmd.cmd_str) && arg1_type == cmd.arg1_type && arg2_type == cmd.arg2_type)
             return cmd;
     }
 
     log("Got unknown command: %s", command);
 
     return (struct Command){.cmd_num = UNKNOWN, .cmd_str = "", .cmd_args_count = 0};
+}
+
+int get_arg_type(const char *str_arg, enum ArgTypes *arg_type_buf)
+{
+    assert(str_arg);
+    assert(arg_type_buf);
+
+    if (!str_arg[0])
+    {
+        *arg_type_buf = ATYPE_VOID;
+        return 0;
+    }
+
+    if (is_num(str_arg))
+    {
+        *arg_type_buf = ATYPE_INT;
+        return 0;
+    }
+
+    for (size_t i = 0; i < REGISTERS_COUNT; i++)
+    {
+        if (!strcmp(str_arg, REGISTERS[i]))
+        {
+            *arg_type_buf = ATYPE_REGISTER;
+            return 0;
+        }
+    }
+    log("Get argument with unknown arg type: %s", str_arg);
+    return 1;
 }
 
 static int parse_command_args(struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2)
@@ -208,6 +253,8 @@ static int parse_command_arg(enum ArgTypes arg_type, const char *str_arg, int *a
 {
     switch (arg_type)
     {
+    case ATYPE_VOID:
+        break;
 
     case ATYPE_INT:
     {

@@ -39,6 +39,28 @@ int is_space_string(const char *str)
     return 1;
 }
 
+int is_num(const char *str)
+{
+    assert(str);
+
+    for (int i = 0; str[i]; i++)
+    {
+        char c = str[i];
+
+        if (i == 0)
+        {
+            if (!isdigit(c) && c != '+' && c != '-')
+                return 0;
+        }
+        else
+        {
+            if (!isdigit(c))
+                return 0;
+        }
+    }
+    return str[0];
+}
+
 // устанавливает поля wrapper->strings и wrapper->strings_count
 int make_strings_arr(struct FileWrapper *wrapper)
 {

@@ -22,6 +22,7 @@ enum Commands
 
 enum ArgTypes
 {
+    ATYPE_VOID,
     ATYPE_INT,
     ATYPE_REGISTER,
 };
@@ -102,7 +103,7 @@ const static struct Command commands[N_COMMANDS] = {
 
     {
         .cmd_num = PUSH_REGISTER,
-        .cmd_str = "PUSHR",
+        .cmd_str = "PUSH",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_REGISTER,
     },
