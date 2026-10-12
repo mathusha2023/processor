@@ -61,6 +61,23 @@ int is_num(const char *str)
     return str[0];
 }
 
+int string_strcmp(struct String s1, const char *s2)
+{
+    assert(s2);
+
+    size_t i = 0;
+    for (i = 0; i < s1.length && s2[i]; i++)
+    {
+        if (s1.p[i] != s2[i])
+            return s1.p[i] - s2[i];
+    }
+    if (i >= s1.length && s2[i] == '\0')
+        return 0;
+    if (s2[i])
+        return -1;
+    return 1;
+}
+
 // устанавливает поля wrapper->strings и wrapper->strings_count
 int make_strings_arr(struct FileWrapper *wrapper)
 {

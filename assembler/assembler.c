@@ -3,18 +3,21 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "file_wrapper/file_wrapper.h"
 #include "file_wrapper/my_string.h"
 #include "file_wrapper/files.h"
 #include "config.h"
 #include "log.h"
 
-static enum ProcessStringError process_string(struct String *string, struct IR *ir);
+static enum ProcessStringError process_labels(struct ASM *asm_obj);
+static enum ProcessStringError process_string(struct String *string, struct IR *ir, struct ASM *asm_obj);
 static struct Command get_command(const char *command, const char *str_arg1, const char *str_arg2);
 int get_arg_type(const char *str_arg, enum ArgTypes *arg_type_buf);
-static int parse_command_args(struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2);
-static int parse_command_arg(enum ArgTypes arg_type, const char *str_arg, int *arg);
+static int parse_command_args(struct ASM *asm_obj, struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2);
+static int parse_command_arg(struct ASM *asm_obj, enum ArgTypes arg_type, const char *str_arg, int *arg);
 static int get_register(const char *str_register);
+static int get_label(struct ASM *asm_obj, const char *label, struct Label *label_buf);
 static int write_ir_to_buffer(char *buffer, size_t buffer_size, struct IR *ir);
 
 int asm_data(struct FileWrapper *file, const char *output_file_name, const char *output_debug_file_name)
@@ -31,17 +34,23 @@ int asm_data(struct FileWrapper *file, const char *output_file_name, const char 
         return error;
     }
 
-    long long code[MAX_CODE_LENGTH] = {};
-    size_t code_index = 0;
+    struct ASM asm_obj = {.file = file};
+
+    enum ProcessStringError labels_error = process_labels(&asm_obj);
+    if (labels_error != PSE_OK)
+    {
+        log("Error while processing labels");
+        return labels_error;
+    }
 
     for (size_t i = 0; i < file->strings_count; i++)
     {
         struct IR ir = {};
         char buffer[MAX_COMMAND_LENGTH] = {};
 
-        enum ProcessStringError error = process_string(file->strings + i, &ir);
+        enum ProcessStringError error = process_string(file->strings + i, &ir, &asm_obj);
 
-        if (error == PSE_EMPTY_STRING)
+        if (error == PSE_EMPTY_STRING || error == PSE_IS_LABEL)
             continue;
 
         if (error != PSE_OK)
@@ -67,25 +76,25 @@ int asm_data(struct FileWrapper *file, const char *output_file_name, const char 
             return _error;
         }
 
-        assert(code_index < MAX_CODE_LENGTH);
-        code[code_index++] = ir.cmd;
+        assert(asm_obj.code_index < MAX_CODE_LENGTH);
+        asm_obj.code[asm_obj.code_index++] = ir.cmd;
 
         if (ir.cmd_args_count > 0)
         {
-            assert(code_index < MAX_CODE_LENGTH);
-            code[code_index++] = ir.arg1;
+            assert(asm_obj.code_index < MAX_CODE_LENGTH);
+            asm_obj.code[asm_obj.code_index++] = ir.arg1;
         }
 
         if (ir.cmd_args_count > 1)
         {
-            assert(code_index < MAX_CODE_LENGTH);
-            code[code_index++] = ir.arg2;
+            assert(asm_obj.code_index < MAX_CODE_LENGTH);
+            asm_obj.code[asm_obj.code_index++] = ir.arg2;
         }
     }
 
     fclose(output_file);
 
-    int error = write_bin(output_file_name, (void *)code, sizeof(code[-2]), code_index);
+    int error = write_bin(output_file_name, (void *)asm_obj.code, sizeof(asm_obj.code[0]), asm_obj.code_index);
     if (error)
     {
         log("Error while writing code to bin file %s: %d", output_file_name, error);
@@ -95,10 +104,52 @@ int asm_data(struct FileWrapper *file, const char *output_file_name, const char 
     return 0;
 }
 
-static enum ProcessStringError process_string(struct String *string, struct IR *ir)
+static enum ProcessStringError process_labels(struct ASM *asm_obj)
+{
+    assert(asm_obj);
+
+    asm_obj->labels_count = 0;
+    size_t label_pos = 0;
+
+    for (size_t i = 0; i < asm_obj->file->strings_count; i++)
+    {
+        struct String string = asm_obj->file->strings[i];
+        struct IR ir = {};
+
+        enum ProcessStringError error = process_string(&string, &ir, asm_obj);
+
+        if (error != PSE_OK && error != PSE_IS_LABEL && error != PSE_EMPTY_STRING)
+            return error;
+
+        if (error == PSE_OK)
+        {
+            label_pos++;
+            label_pos += ir.cmd_args_count;
+        }
+
+        else if (error == PSE_IS_LABEL)
+        {
+            // убираем лишние пробелы в конце строки
+            while (isspace(string.p[string.length - 1]))
+                string.length--;
+
+            assert(asm_obj->labels_count < MAX_LABELS_COUNT);
+
+            asm_obj->labels[asm_obj->labels_count++] = (struct Label){
+                .str = string,
+                .position = label_pos,
+            };
+        }
+    }
+    asm_obj->labels_ready = 1;
+    return PSE_OK;
+}
+
+static enum ProcessStringError process_string(struct String *string, struct IR *ir, struct ASM *asm_obj)
 {
     assert(string);
     assert(ir);
+    assert(asm_obj);
 
     // real_string - та же строка что и в string->p, но с \0 на конце
     char real_string[MAX_COMMAND_LENGTH] = {};
@@ -117,6 +168,12 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
     if (is_space_string(real_string))
     {
         return PSE_EMPTY_STRING;
+    }
+
+    // является меткой
+    if (real_string[0] == ':')
+    {
+        return PSE_IS_LABEL;
     }
 
     int res = sscanf(real_string, "%s %s %s", str_command, str_arg1, str_arg2);
@@ -143,14 +200,17 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
     ir->cmd = command.cmd_num;
     ir->cmd_args_count = command.cmd_args_count;
 
-    if (parse_command_args(&command, str_arg1, str_arg2, &arg1, &arg2))
+    if (asm_obj->labels_ready)
     {
-        log("Error while parsing command args!");
-        return PSE_INVALID_ARGS;
-    }
+        if (parse_command_args(asm_obj, &command, str_arg1, str_arg2, &arg1, &arg2))
+        {
+            log("Error while parsing command args!");
+            return PSE_INVALID_ARGS;
+        }
 
-    ir->arg1 = arg1;
-    ir->arg2 = arg2;
+        ir->arg1 = arg1;
+        ir->arg2 = arg2;
+    }
 
     return PSE_OK;
 }
@@ -204,6 +264,12 @@ int get_arg_type(const char *str_arg, enum ArgTypes *arg_type_buf)
         return 0;
     }
 
+    if (str_arg[0] == ':')
+    {
+        *arg_type_buf = ATYPE_LABEL;
+        return 0;
+    }
+
     for (size_t i = 0; i < REGISTERS_COUNT; i++)
     {
         if (!strcmp(str_arg, REGISTERS[i]))
@@ -216,7 +282,7 @@ int get_arg_type(const char *str_arg, enum ArgTypes *arg_type_buf)
     return 1;
 }
 
-static int parse_command_args(struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2)
+static int parse_command_args(struct ASM *asm_obj, struct Command *command, const char *str_arg1, const char *str_arg2, int *arg1, int *arg2)
 {
     assert(command);
     assert(str_arg1);
@@ -229,7 +295,7 @@ static int parse_command_args(struct Command *command, const char *str_arg1, con
 
     if (command->cmd_args_count > 0)
     {
-        int res = parse_command_arg(command->arg1_type, str_arg1, arg1);
+        int res = parse_command_arg(asm_obj, command->arg1_type, str_arg1, arg1);
         if (res)
         {
             log("Error while parsing command %s arg1 %s", command->cmd_str, str_arg1);
@@ -238,7 +304,7 @@ static int parse_command_args(struct Command *command, const char *str_arg1, con
     }
     if (command->cmd_args_count > 1)
     {
-        int res = parse_command_arg(command->arg2_type, str_arg2, arg2);
+        int res = parse_command_arg(asm_obj, command->arg2_type, str_arg2, arg2);
         if (res)
         {
             log("Error while parsing command %s arg1 %s", command->cmd_str, str_arg2);
@@ -249,7 +315,7 @@ static int parse_command_args(struct Command *command, const char *str_arg1, con
     return 0;
 }
 
-static int parse_command_arg(enum ArgTypes arg_type, const char *str_arg, int *arg)
+static int parse_command_arg(struct ASM *asm_obj, enum ArgTypes arg_type, const char *str_arg, int *arg)
 {
     switch (arg_type)
     {
@@ -279,6 +345,20 @@ static int parse_command_arg(enum ArgTypes arg_type, const char *str_arg, int *a
         break;
     }
 
+    case ATYPE_LABEL:
+    {
+        struct Label label = {};
+
+        int res = get_label(asm_obj, str_arg, &label);
+        if (res)
+        {
+            log("Error while getting label %s", str_arg);
+            return 1;
+        }
+        *arg = (int)label.position;
+        break;
+    }
+
     default:
         log("Unknown arg type: %d", arg_type);
         return 1;
@@ -301,6 +381,25 @@ static int get_register(const char *str_register)
 
     log("Got unknown register: %s", str_register);
     return -1;
+}
+
+static int get_label(struct ASM *asm_obj, const char *label, struct Label *label_buf)
+{
+    assert(asm_obj);
+    assert(label);
+
+    for (size_t i = 0; i < asm_obj->labels_count; i++)
+    {
+        struct Label lbl = asm_obj->labels[i];
+
+        if (!string_strcmp(lbl.str, label))
+        {
+            *label_buf = lbl;
+            return 0;
+        }
+    }
+    log("Undefined label: %s", label);
+    return 1;
 }
 
 // 1 если все плохо, 0 если все хорошо

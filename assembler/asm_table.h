@@ -26,6 +26,7 @@ enum ArgTypes
     ATYPE_VOID,
     ATYPE_INT,
     ATYPE_REGISTER,
+    ATYPE_LABEL,
 };
 
 struct Command
@@ -113,7 +114,7 @@ const static struct Command commands[N_COMMANDS] = {
         .cmd_num = JMP,
         .cmd_str = "JMP",
         .cmd_args_count = 1,
-        .arg1_type = ATYPE_INT,
+        .arg1_type = ATYPE_LABEL,
     },
 };
 
