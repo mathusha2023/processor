@@ -59,7 +59,7 @@ VMError load_program(VM *vm, const char *filename)
 
     if (read_count != code_length)
     {
-        LOG("Error while reading program file: read %lu commands but %lu expected", read_count, code_length);
+        LOG("Error while reading program file %s: read %lu commands but %lu expected", filename, read_count, code_length);
         fclose(file);
         error.vm_error = VM_ERROR_READING_FILE;
         return error;
@@ -145,6 +145,13 @@ ExecutorError execute_command(VM *vm)
         return epush_register(vm);
     case JMP:
         return ejmp(vm);
+    case JA:
+    case JB:
+    case JAE:
+    case JBE:
+    case JE:
+    case JNE:
+        return ejmp_condition(vm);
     default:
         LOG("ERROR: unknown command while casing executing command");
         assert(0 && "ПРОИЗОШЕЛ ПОЛНЫЙ БЛЯЗДЕЦ");

@@ -2,9 +2,11 @@
 #include "config.h"
 #include "log.h"
 
-int main(void)
+int main(int argc, char *argv[])
 {
     restart_log();
+
+    const char *program_file_name = argc > 1 ? argv[1] : DEFAULT_PROGRAM_FILE_NAME;
 
     VM vm = {};
     VMError error = {};
@@ -17,7 +19,7 @@ int main(void)
         return error.vm_error;
     }
 
-    error = load_program(&vm, DEFAULT_PROGRAM_FILE_NAME);
+    error = load_program(&vm, program_file_name);
     if (error.stack_error || error.executor_error || error.vm_error)
     {
         LOG("Error while loading program");

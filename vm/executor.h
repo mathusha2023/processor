@@ -7,7 +7,7 @@ typedef enum ExecError
 {
     EXECUTOR_OK,
     EXECUTOR_DIVISION_BY_ZERO,
-    EXECUTOR_SQRT_FROM_NEGATIVE_NUMBER
+    EXECUTOR_SQRT_FROM_NEGATIVE_NUMBER,
 } ExecError;
 
 static const char *STR_EXEC_ERRORS[] = {
@@ -46,6 +46,7 @@ ExecutorError epop(VM *vm);
 ExecutorError epush_register(VM *vm);
 
 ExecutorError ejmp(VM *vm);
+ExecutorError ejmp_condition(VM *vm);
 
 const char *get_exec_error(ExecError error);
 

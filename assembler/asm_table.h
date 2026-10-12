@@ -17,6 +17,12 @@ enum Commands
     POP = 9,
     PUSH_REGISTER = 10,
     JMP = 11,
+    JA = 12,
+    JB = 13,
+    JAE = 14,
+    JBE = 15,
+    JE = 16,
+    JNE = 17,
 
     UNKNOWN = 1488,
 };
@@ -38,7 +44,7 @@ struct Command
     const enum ArgTypes arg2_type;
 };
 
-const size_t N_COMMANDS = 12;
+const size_t N_COMMANDS = 18;
 
 const static struct Command commands[N_COMMANDS] = {
     {
@@ -113,6 +119,43 @@ const static struct Command commands[N_COMMANDS] = {
     {
         .cmd_num = JMP,
         .cmd_str = "JMP",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_LABEL,
+    },
+
+    {
+        .cmd_num = JA,
+        .cmd_str = "JA",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_LABEL,
+    },
+    {
+        .cmd_num = JB,
+        .cmd_str = "JB",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_LABEL,
+    },
+    {
+        .cmd_num = JAE,
+        .cmd_str = "JAE",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_LABEL,
+    },
+    {
+        .cmd_num = JBE,
+        .cmd_str = "JBE",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_LABEL,
+    },
+    {
+        .cmd_num = JE,
+        .cmd_str = "JE",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_LABEL,
+    },
+    {
+        .cmd_num = JNE,
+        .cmd_str = "JNE",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
     },

@@ -8,6 +8,7 @@
 ExecutorError ehlt(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == HLT);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -26,6 +27,7 @@ ExecutorError ehlt(VM *vm)
 ExecutorError epush_number(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == PUSH_NUMBER);
 
     long long value = vm->current_command.arg1;
 
@@ -46,6 +48,7 @@ ExecutorError epush_number(VM *vm)
 ExecutorError eadd(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == ADD);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -83,6 +86,7 @@ ExecutorError eadd(VM *vm)
 ExecutorError esub(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == SUB);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -121,6 +125,7 @@ ExecutorError esub(VM *vm)
 ExecutorError emul(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == MUL);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -159,6 +164,7 @@ ExecutorError emul(VM *vm)
 ExecutorError ediv(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == DIV);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -207,6 +213,7 @@ ExecutorError ediv(VM *vm)
 ExecutorError eabs(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == ABS);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -237,6 +244,7 @@ ExecutorError eabs(VM *vm)
 ExecutorError esqrt(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == SQRT);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -277,6 +285,7 @@ ExecutorError esqrt(VM *vm)
 ExecutorError eout(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == OUT);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -300,6 +309,7 @@ ExecutorError eout(VM *vm)
 ExecutorError epop(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == POP);
 
     long long register_num = vm->current_command.arg1;
     assert(0 <= register_num && register_num < (long long)vm->registers_count);
@@ -324,6 +334,7 @@ ExecutorError epop(VM *vm)
 ExecutorError epush_register(VM *vm)
 {
     assert(vm);
+    assert(vm->current_command.cmd == PUSH_REGISTER);
 
     long long register_num = vm->current_command.arg1;
     assert(0 <= register_num && register_num < (long long)vm->registers_count);
@@ -347,9 +358,62 @@ ExecutorError ejmp(VM *vm)
     assert(vm);
     assert(0 <= vm->current_command.arg1 && (size_t)vm->current_command.arg1 < vm->code_length);
 
+    enum Commands cmd = vm->current_command.cmd;
+    assert(cmd == JMP || cmd == JA || cmd == JB || cmd == JAE || cmd == JBE || cmd == JE || cmd == JNE);
+
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
     vm->IP = (size_t)vm->current_command.arg1;
+    return error;
+}
+
+ExecutorError ejmp_condition(VM *vm)
+{
+    assert(vm);
+    assert(0 <= vm->current_command.arg1 && (size_t)vm->current_command.arg1 < vm->code_length);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    long long x = 0, y = 0;
+
+    error.stack_error = pop_stack(&vm->stack, &y);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack popping first value : %s", get_stack_error(error.stack_error));
+        return error;
+    }
+
+    error.stack_error = pop_stack(&vm->stack, &x);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack popping second value : %s", get_stack_error(error.stack_error));
+
+        // вернуть на место забранный ранее y
+        push_stack(&vm->stack, y);
+        return error;
+    }
+
+    enum Commands cmd = vm->current_command.cmd;
+    assert(cmd == JA || cmd == JB || cmd == JAE || cmd == JBE || cmd == JE || cmd == JNE);
+
+    if (cmd == JA && x > y)
+        return ejmp(vm);
+
+    if (cmd == JB && x < y)
+        return ejmp(vm);
+
+    if (cmd == JAE && x >= y)
+        return ejmp(vm);
+
+    if (cmd == JBE && x <= y)
+        return ejmp(vm);
+
+    if (cmd == JE && x == y)
+        return ejmp(vm);
+
+    if (cmd == JNE && x != y)
+        return ejmp(vm);
+
     return error;
 }
 
