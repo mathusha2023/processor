@@ -6,6 +6,7 @@
 int main(int argc, char *argv[])
 {
     restart_log();
+    srand(time(NULL));
 
     log("Beginning compilation...");
 

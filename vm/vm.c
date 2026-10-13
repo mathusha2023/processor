@@ -18,12 +18,20 @@ VMError init_vm(VM *vm)
     vm->IP = 0;
 
     error.stack_error = init_stack(&vm->stack, START_STACK_CAPACITY);
-    vm->registers_count = REGISTERS_COUNT;
-
     if (error.stack_error != STACK_OK)
     {
         LOG("Error in vm stack initialization: %s", get_stack_error(error.stack_error));
+        return error;
     }
+
+    error.stack_error = init_stack(&vm->ret_addresses_stack, START_STACK_CAPACITY);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in ret_addresses_stack initialization: %s", get_stack_error(error.stack_error));
+        return error;
+    }
+
+    vm->registers_count = REGISTERS_COUNT;
 
     return error;
 }
@@ -78,20 +86,27 @@ VMError execute_program(VM *vm)
     assert(vm->code);
     assert(vm->code_length);
 
+    VMError vm_error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK, .vm_error = VM_OK};
+
     while (vm->IP < vm->code_length)
     {
         get_next_command(vm);
 
         ExecutorError error = execute_command(vm);
-        if (error.stack_error || error.stack_error)
+        if (error.executor_error == EXECUTOR_END_PROGRAM)
+            break;
+
+        if (error.stack_error || error.executor_error)
         {
             LOG("ERROR while executing command at line %lu", vm->IP);
-            return (VMError){.stack_error = error.stack_error,
-                             .executor_error = error.executor_error,
-                             .vm_error = VM_ERROR_EXECUTE_COMMAND};
+
+            vm_error.stack_error = error.stack_error;
+            vm_error.executor_error = error.executor_error;
+            vm_error.vm_error = VM_ERROR_EXECUTE_COMMAND;
+            break;
         }
     }
-    return (VMError){.stack_error = STACK_OK, .executor_error = EXECUTOR_OK, .vm_error = VM_OK};
+    return vm_error;
 }
 
 VMError babah_vm(VM *vm)
@@ -103,10 +118,19 @@ VMError babah_vm(VM *vm)
     if (is_stack_empty(&vm->stack) != STACK_OK)
     {
         error.stack_error = destroy_stack(&vm->stack);
-
         if (error.stack_error)
         {
             LOG("Error while destroing vm: %s", get_stack_error(error.stack_error));
+            return error;
+        }
+    }
+
+    if (is_stack_empty(&vm->ret_addresses_stack) != STACK_OK)
+    {
+        if (error.stack_error)
+        {
+            LOG("Error while destroing ret_addresses_stack: %s", get_stack_error(error.stack_error));
+            return error;
         }
     }
 
@@ -138,6 +162,7 @@ ExecutorError execute_command(VM *vm)
     case SQRT:
         return esqrt(vm);
     case OUT:
+    case OUTC:
         return eout(vm);
     case POP:
         return epop(vm);
@@ -152,6 +177,16 @@ ExecutorError execute_command(VM *vm)
     case JE:
     case JNE:
         return ejmp_condition(vm);
+    case CALL:
+        return ecall(vm);
+    case RET:
+        return eret(vm);
+    case IN:
+        return ein(vm);
+    case DORA:
+        return edora(vm);
+    case RND:
+        return ernd(vm);
     default:
         LOG("ERROR: unknown command while casing executing command");
         assert(0 && "ПРОИЗОШЕЛ ПОЛНЫЙ БЛЯЗДЕЦ");
@@ -179,6 +214,7 @@ static struct Command get_next_command(VM *vm)
     assert(vm->IP < vm->code_length);
     enum Commands cmd = (enum Commands)vm->code[vm->IP++];
 
+    assert(cmd < N_COMMANDS);
     struct Command const_command = commands[cmd];
     assert(cmd == const_command.cmd);
 

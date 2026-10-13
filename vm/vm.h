@@ -38,6 +38,7 @@ typedef struct VM
     long long code[MAX_CODE_LENGTH];
     size_t code_length;
     Stack stack;
+    Stack ret_addresses_stack;
     size_t registers_count;
     long long registers[REGISTERS_COUNT];
     size_t IP;

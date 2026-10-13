@@ -6,6 +6,7 @@
 typedef enum ExecError
 {
     EXECUTOR_OK,
+    EXECUTOR_END_PROGRAM,
     EXECUTOR_DIVISION_BY_ZERO,
     EXECUTOR_SQRT_FROM_NEGATIVE_NUMBER,
 } ExecError;
@@ -47,6 +48,15 @@ ExecutorError epush_register(VM *vm);
 
 ExecutorError ejmp(VM *vm);
 ExecutorError ejmp_condition(VM *vm);
+
+ExecutorError ecall(VM *vm);
+ExecutorError eret(VM *vm);
+
+ExecutorError ein(VM *vm);
+
+ExecutorError edora(VM *vm);
+
+ExecutorError ernd(VM *vm);
 
 const char *get_exec_error(ExecError error);
 

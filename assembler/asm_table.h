@@ -23,6 +23,12 @@ enum Commands
     JBE = 15,
     JE = 16,
     JNE = 17,
+    CALL = 18,
+    RET = 19,
+    IN = 20,
+    OUTC = 21,
+    DORA = 22,
+    RND = 23,
 
     UNKNOWN = 1488,
 };
@@ -44,7 +50,7 @@ struct Command
     const enum ArgTypes arg2_type;
 };
 
-const size_t N_COMMANDS = 18;
+const size_t N_COMMANDS = 24;
 
 const static struct Command commands[N_COMMANDS] = {
     {
@@ -129,36 +135,79 @@ const static struct Command commands[N_COMMANDS] = {
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
     },
+
     {
         .cmd_num = JB,
         .cmd_str = "JB",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
     },
+
     {
         .cmd_num = JAE,
         .cmd_str = "JAE",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
     },
+
     {
         .cmd_num = JBE,
         .cmd_str = "JBE",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
     },
+
     {
         .cmd_num = JE,
         .cmd_str = "JE",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
     },
+
     {
         .cmd_num = JNE,
         .cmd_str = "JNE",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
     },
+
+    {
+        .cmd_num = CALL,
+        .cmd_str = "CALL",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_LABEL,
+    },
+
+    {
+        .cmd_num = RET,
+        .cmd_str = "RET",
+        .cmd_args_count = 0,
+    },
+
+    {
+        .cmd_num = IN,
+        .cmd_str = "IN",
+        .cmd_args_count = 0,
+    },
+
+    {
+        .cmd_num = OUTC,
+        .cmd_str = "OUTC",
+        .cmd_args_count = 0,
+    },
+
+    {
+        .cmd_num = DORA,
+        .cmd_str = "DORA",
+        .cmd_args_count = 0,
+    },
+
+    {
+        .cmd_num = RND,
+        .cmd_str = "RND",
+        .cmd_args_count = 0,
+    },
+
 };
 
 #endif // ASM_TABLE_H

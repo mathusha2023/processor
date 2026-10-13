@@ -165,6 +165,12 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
         return PSE_COPY_ERROR;
     }
 
+    char *comment_symb = strchr(real_string, COMMENT_CHAR);
+    if (comment_symb != NULL)
+    {
+        *comment_symb = '\0';
+    }
+
     if (is_space_string(real_string))
     {
         return PSE_EMPTY_STRING;

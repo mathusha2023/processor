@@ -1,0 +1,105 @@
+    CALL :print_enter_from_number ; печать подсказки для первого числа
+    IN
+    POP AX 
+
+    CALL :print_enter_to_number ; печать подсказки для второго числа
+    IN
+    POP BX
+
+:metka
+
+    PUSH AX
+    PUSH AX
+    MUL
+    OUT
+
+    PUSH AX
+    PUSH 1
+    ADD                           
+    POP AX
+
+    PUSH AX 
+    PUSH BX
+    JBE :metka  ; Переходим к метке пока AX < BX
+
+
+    HLT ; завершение программы, чтобы не провалиться на выполнение процедур
+
+
+:print_enter_from_number
+    PUSH 69
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 70
+    OUTC
+    PUSH 82
+    OUTC
+    PUSH 79
+    OUTC
+    PUSH 77
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 109
+    OUTC
+    PUSH 98
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 10
+    OUTC
+    RET
+
+:print_enter_to_number
+    PUSH 69
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 84
+    OUTC
+    PUSH 79
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 109
+    OUTC
+    PUSH 98
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 10
+    OUTC
+    RET
