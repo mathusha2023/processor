@@ -5,6 +5,7 @@
 int main(int argc, char *argv[])
 {
     restart_log();
+    srand((unsigned int)time(NULL));
 
     const char *program_file_name = argc > 1 ? argv[1] : DEFAULT_PROGRAM_FILE_NAME;
 

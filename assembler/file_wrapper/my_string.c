@@ -78,6 +78,18 @@ int string_strcmp(struct String s1, const char *s2)
     return 1;
 }
 
+const char *string_chr(struct String *s, char c)
+{
+    assert(s);
+
+    for (size_t i = 0; i < s->length; i++)
+    {
+        if (s->p[i] == c)
+            return s->p + i;
+    }
+    return NULL;
+}
+
 // устанавливает поля wrapper->strings и wrapper->strings_count
 int make_strings_arr(struct FileWrapper *wrapper)
 {

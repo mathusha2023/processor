@@ -1,0 +1,205 @@
+    CALL :enter_your_number_text
+    IN ; число факториал которого мы берем
+    POP AX
+
+    ; если число меньше 0, то выходим из проги
+    PUSH AX
+    PUSH 0
+    JB :incorrect_input_exit
+
+    PUSH 1
+    POP DX ; инициализируем произведение единицей
+
+    CALL :factorial
+    CALL :your_answer_text
+    OUT
+
+    JMP :exit
+
+; Ниже идут функции
+
+; в AX передаем текущее значение n, 
+; в DX - текущее произведение
+; в конце работы результат будет в стэке и в DX
+:factorial 
+        PUSH AX 
+        PUSH 1
+        JBE :factorial_return
+
+        PUSH AX
+        PUSH DX 
+        MUL
+        POP DX 
+
+        PUSH AX 
+        PUSH 1
+        SUB
+        POP AX
+
+        CALL :factorial
+
+    :factorial_return
+        PUSH DX
+        RET
+
+:incorrect_input_exit
+    CALL :error_text
+    JMP :exit
+
+:exit 
+    HLT
+
+:enter_your_number_text
+    PUSH 69
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 121
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 109
+    OUTC
+    PUSH 98
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 10
+    OUTC
+    RET
+
+:error_text 
+    PUSH 69
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 121
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 109
+    OUTC
+    PUSH 98
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 109
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 115
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 98
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 112
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 115
+    OUTC
+    PUSH 105
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 105
+    OUTC
+    PUSH 118
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 48
+    OUTC
+    PUSH 10
+    OUTC
+    RET
+
+:your_answer_text
+    PUSH 89
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 97
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 115
+    OUTC
+    PUSH 119
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 32
+    OUTC
+    RET

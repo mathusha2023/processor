@@ -18,6 +18,7 @@ static int parse_command_args(struct ASM *asm_obj, struct Command *command, cons
 static int parse_command_arg(struct ASM *asm_obj, enum ArgTypes arg_type, const char *str_arg, int *arg);
 static int get_register(const char *str_register);
 static int get_label(struct ASM *asm_obj, const char *label, struct Label *label_buf);
+static inline void format_label_string(struct String *string);
 static int write_ir_to_buffer(char *buffer, size_t buffer_size, struct IR *ir);
 
 int asm_data(struct FileWrapper *file, const char *output_file_name, const char *output_debug_file_name)
@@ -129,12 +130,9 @@ static enum ProcessStringError process_labels(struct ASM *asm_obj)
 
         else if (error == PSE_IS_LABEL)
         {
-            // убираем лишние пробелы в конце строки
-            while (isspace(string.p[string.length - 1]))
-                string.length--;
+            format_label_string(&string);
 
             assert(asm_obj->labels_count < MAX_LABELS_COUNT);
-
             asm_obj->labels[asm_obj->labels_count++] = (struct Label){
                 .str = string,
                 .position = label_pos,
@@ -176,13 +174,13 @@ static enum ProcessStringError process_string(struct String *string, struct IR *
         return PSE_EMPTY_STRING;
     }
 
+    int res = sscanf(real_string, "%s %s %s", str_command, str_arg1, str_arg2);
+
     // является меткой
-    if (real_string[0] == ':')
+    if (str_command[0] == ':')
     {
         return PSE_IS_LABEL;
     }
-
-    int res = sscanf(real_string, "%s %s %s", str_command, str_arg1, str_arg2);
 
     if (res < 1)
     {
@@ -425,4 +423,25 @@ static int write_ir_to_buffer(char *buffer, size_t buffer_size, struct IR *ir)
     default:
         return 1;
     }
+}
+
+static inline void format_label_string(struct String *string)
+{
+    assert(string);
+
+    // убираем комментарии
+    const char *comment_symb = string_chr(string, COMMENT_CHAR);
+    if (comment_symb != NULL)
+    {
+        string->length = (size_t)(comment_symb - string->p);
+    }
+
+    // убираем лишние пробелы в начале и конце строки
+    while (isspace(string->p[0]))
+    {
+        string->p++;
+        string->length--;
+    }
+    while (isspace(string->p[string->length - 1]))
+        string->length--;
 }
