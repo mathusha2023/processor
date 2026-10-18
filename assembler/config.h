@@ -5,6 +5,8 @@
 
 // #define DISABLE_LOGS
 
+typedef int asm_el_t;
+
 #define RED_COLOR "\x1b[31m"
 #define GREEN_COLOR "\x1b[32m"
 #define BLUE_COLOR "\x1b[34m"

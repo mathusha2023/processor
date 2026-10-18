@@ -39,7 +39,7 @@ ExecutorError epush_number(VM *vm)
     assert(vm);
     assert(vm->current_command.cmd == PUSH_NUMBER);
 
-    long long value = vm->current_command.arg1;
+    vm_el_t value = vm->current_command.arg1;
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -62,7 +62,7 @@ ExecutorError eadd(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long x = 0, y = 0;
+    vm_el_t x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -101,7 +101,7 @@ ExecutorError esub(VM *vm)
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
     // x лежит выше в стэке, то есть положен туда раньше
-    long long x = 0, y = 0;
+    vm_el_t x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -139,7 +139,7 @@ ExecutorError emul(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long x = 0, y = 0;
+    vm_el_t x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -179,7 +179,7 @@ ExecutorError ediv(VM *vm)
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
     // x лежит выше в стэке, то есть положен туда раньше
-    long long x = 0, y = 0;
+    vm_el_t x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -227,7 +227,7 @@ ExecutorError eabs(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long x = 0;
+    vm_el_t x = 0;
 
     error.stack_error = pop_stack(&vm->stack, &x);
     if (error.stack_error != STACK_OK)
@@ -258,7 +258,7 @@ ExecutorError esqrt(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long x = 0;
+    vm_el_t x = 0;
 
     error.stack_error = pop_stack(&vm->stack, &x);
     if (error.stack_error != STACK_OK)
@@ -277,7 +277,7 @@ ExecutorError esqrt(VM *vm)
         return error;
     }
 
-    x = (long long)(DELTA * sqrt((double)x / DELTA));
+    x = (vm_el_t)(DELTA * sqrt((double)x / DELTA));
 
     error.stack_error = push_stack(&vm->stack, x);
     if (error.stack_error != STACK_OK)
@@ -299,7 +299,7 @@ ExecutorError eout(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long value = 0;
+    vm_el_t value = 0;
 
     error.stack_error = pop_stack(&vm->stack, &value);
     if (error.stack_error != STACK_OK)
@@ -323,7 +323,7 @@ ExecutorError eoutc(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long value = 0;
+    vm_el_t value = 0;
 
     error.stack_error = pop_stack(&vm->stack, &value);
     if (error.stack_error != STACK_OK)
@@ -345,12 +345,12 @@ ExecutorError epop_register(VM *vm)
     assert(vm);
     assert(vm->current_command.cmd == POP_REGISTER);
 
-    long long register_num = vm->current_command.arg1;
-    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+    vm_el_t register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (vm_el_t)vm->registers_count);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long value = 0;
+    vm_el_t value = 0;
 
     error.stack_error = pop_stack(&vm->stack, &value);
     if (error.stack_error != STACK_OK)
@@ -371,8 +371,8 @@ ExecutorError epush_register(VM *vm)
     assert(vm);
     assert(vm->current_command.cmd == PUSH_REGISTER);
 
-    long long register_num = vm->current_command.arg1;
-    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+    vm_el_t register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (vm_el_t)vm->registers_count);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -412,7 +412,7 @@ ExecutorError ejmp_condition(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long x = 0, y = 0;
+    vm_el_t x = 0, y = 0;
 
     error.stack_error = pop_stack(&vm->stack, &y);
     if (error.stack_error != STACK_OK)
@@ -477,7 +477,7 @@ ExecutorError eret(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long return_address = 0;
+    vm_el_t return_address = 0;
 
     error.stack_error = pop_stack(&vm->ret_addresses_stack, &return_address);
     if (error.stack_error != STACK_OK)
@@ -500,8 +500,8 @@ ExecutorError ein(VM *vm)
 
     printf(">>> ");
 
-    long long value = 0;
-    scanf("%lld", &value);
+    vm_el_t value = 0;
+    scanf(VM_EL_SPECIFICATOR, &value);
 
     error.stack_error = push_stack(&vm->stack, value * DELTA);
     if (error.stack_error != STACK_OK)
@@ -534,7 +534,7 @@ ExecutorError ernd(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long random_value = rand();
+    vm_el_t random_value = rand();
 
     error.stack_error = push_stack(&vm->stack, random_value);
     if (error.stack_error != STACK_OK)
@@ -552,7 +552,7 @@ ExecutorError epush_memory_int(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long mem_addr = vm->current_command.arg1;
+    vm_el_t mem_addr = vm->current_command.arg1;
 
     error.stack_error = push_stack(&vm->stack, vm->RAM[mem_addr]);
     if (error.stack_error != STACK_OK)
@@ -570,8 +570,8 @@ ExecutorError epush_memory_register(VM *vm)
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long register_num = vm->current_command.arg1;
-    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+    vm_el_t register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (vm_el_t)vm->registers_count);
 
     error.stack_error = push_stack(&vm->stack, vm->RAM[vm->registers[register_num] / DELTA]);
     if (error.stack_error != STACK_OK)
@@ -589,11 +589,11 @@ ExecutorError epop_memory_int(VM *vm)
     assert(vm);
     assert(vm->current_command.cmd == POP_MEMORY_INT);
 
-    long long mem_adr = vm->current_command.arg1;
+    vm_el_t mem_adr = vm->current_command.arg1;
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long value = 0;
+    vm_el_t value = 0;
 
     error.stack_error = pop_stack(&vm->stack, &value);
     if (error.stack_error != STACK_OK)
@@ -611,12 +611,12 @@ ExecutorError epop_memory_register(VM *vm)
     assert(vm);
     assert(vm->current_command.cmd == POP_MEMORY_REGISTER);
 
-    long long register_num = vm->current_command.arg1;
-    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+    vm_el_t register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (vm_el_t)vm->registers_count);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
-    long long value = 0;
+    vm_el_t value = 0;
 
     error.stack_error = pop_stack(&vm->stack, &value);
     if (error.stack_error != STACK_OK)
@@ -634,8 +634,8 @@ ExecutorError edec(VM *vm)
     assert(vm);
     assert(vm->current_command.cmd == DEC);
 
-    long long register_num = vm->current_command.arg1;
-    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+    vm_el_t register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (vm_el_t)vm->registers_count);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -649,8 +649,8 @@ ExecutorError einc(VM *vm)
     assert(vm);
     assert(vm->current_command.cmd == INC);
 
-    long long register_num = vm->current_command.arg1;
-    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+    vm_el_t register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (vm_el_t)vm->registers_count);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 

@@ -71,7 +71,7 @@ with open(COMMANDS_TABLE_H_PATH, "w") as file:
     file.write("""#ifndef COMMANDS_TABLE_H
 #define COMMANDS_TABLE_H
 
-#include <stddef.h>\n\n""")
+#include <stddef.h>\n#include "config.h"\n\n""")
 
     file.write("enum Commands\n")
     file.write("{\n")
@@ -84,8 +84,8 @@ with open(COMMANDS_TABLE_H_PATH, "w") as file:
 {
     enum Commands cmd;
     size_t cmd_args_count;
-    long long arg1;
-    long long arg2;
+    vm_el_t arg1;
+    vm_el_t arg2;
 };\n\n""")
 
     file.write(f"const size_t N_COMMANDS = {N_COMMANDS};\n\n")

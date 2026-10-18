@@ -13,10 +13,7 @@
     MUL
     OUT
 
-    PUSH AX
-    PUSH 1
-    ADD                           
-    POP AX
+    INC AX
 
     PUSH AX 
     PUSH BX

@@ -9,7 +9,7 @@
 // #define NSTKDEBUG
 
 // значения которые по сути и задают полное поведение стэка
-#define STACK_EL_TYPE long long
+#define STACK_EL_TYPE int
 #define STACK_EL_SPECIFICATOR "%lld"
 
 // комбинация 2 обертки + переменная для прокидывания именно

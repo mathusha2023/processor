@@ -34,7 +34,7 @@ struct Label
 struct ASM
 {
     struct FileWrapper *file;
-    long long code[MAX_CODE_LENGTH];
+    asm_el_t code[MAX_CODE_LENGTH];
     size_t code_index;
     struct Label labels[MAX_LABELS_COUNT];
     size_t labels_count;

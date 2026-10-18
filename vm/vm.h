@@ -35,18 +35,18 @@ typedef struct VMError
 
 typedef struct VM
 {
-    long long code[MAX_CODE_LENGTH];
+    vm_el_t code[MAX_CODE_LENGTH];
     size_t code_length;
     Stack stack;
     Stack ret_addresses_stack;
     size_t registers_count;
-    long long registers[REGISTERS_COUNT];
+    vm_el_t registers[REGISTERS_COUNT];
     size_t IP;
-    long long *RAM;
+    vm_el_t *RAM;
     struct Command current_command;
 } VM;
 
-VMError init_vm(VM *vm, long long *ram_p);
+VMError init_vm(VM *vm, vm_el_t *ram_p);
 VMError load_program(VM *vm, const char *filename);
 VMError execute_program(VM *vm);
 VMError babah_vm(VM *vm);

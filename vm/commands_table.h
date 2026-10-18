@@ -4,6 +4,7 @@
 #define COMMANDS_TABLE_H
 
 #include <stddef.h>
+#include "config.h"
 
 enum Commands
 {
@@ -43,8 +44,8 @@ struct Command
 {
     enum Commands cmd;
     size_t cmd_args_count;
-    long long arg1;
-    long long arg2;
+    vm_el_t arg1;
+    vm_el_t arg2;
 };
 
 const size_t N_COMMANDS = 30;

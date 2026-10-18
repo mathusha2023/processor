@@ -8,7 +8,7 @@ static struct Command get_next_command(VM *vm);
 static off_t get_file_size(FILE *file);
 static inline size_t min(size_t a, size_t b);
 
-VMError init_vm(VM *vm, long long *ram_p)
+VMError init_vm(VM *vm, vm_el_t *ram_p)
 {
     assert(vm);
     assert(ram_p);
@@ -63,9 +63,9 @@ VMError load_program(VM *vm, const char *filename)
         return error;
     }
 
-    size_t code_length = (size_t)file_size / sizeof(long long);
+    size_t code_length = (size_t)file_size / sizeof(vm_el_t);
 
-    size_t read_count = fread(vm->code, sizeof(long long), min(code_length, MAX_CODE_LENGTH), file);
+    size_t read_count = fread(vm->code, sizeof(vm_el_t), min(code_length, MAX_CODE_LENGTH), file);
 
     if (read_count != code_length)
     {

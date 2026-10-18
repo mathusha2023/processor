@@ -6,6 +6,9 @@
 // #define DISABLE_LOGS
 // #define NSTKDEBUG
 
+typedef int vm_el_t;
+const char VM_EL_SPECIFICATOR[] = "%d";
+
 #define RED_COLOR "\x1b[31m"
 #define GREEN_COLOR "\x1b[32m"
 #define BLUE_COLOR "\x1b[34m"
@@ -25,7 +28,7 @@ const char DEFAULT_PROGRAM_FILE_NAME[] = "../assembler/res.baa";
 const double EPSILON = 1e-6;
 
 // фиксированная точность вычислений
-const long long DELTA = 1000;
+const vm_el_t DELTA = 1000;
 
 const size_t MAX_COMMAND_LENGTH = 100;
 const size_t MAX_CODE_LENGTH = 1000;
