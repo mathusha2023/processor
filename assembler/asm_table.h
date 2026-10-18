@@ -10,37 +10,45 @@ enum Commands
 	ABS = 0,
 	ADD = 1,
 	CALL = 2,
-	DIV = 3,
-	DORA = 4,
-	HLT = 5,
-	IN = 6,
-	JA = 7,
-	JAE = 8,
-	JB = 9,
-	JBE = 10,
-	JE = 11,
-	JMP = 12,
-	JNE = 13,
-	MUL = 14,
-	OUT = 15,
-	OUTC = 16,
-	POP = 17,
-	PUSH_NUMBER = 18,
-	PUSH_REGISTER = 19,
-	RET = 20,
-	RND = 21,
-	SQRT = 22,
-	SUB = 23,
+	DEC = 3,
+	DIV = 4,
+	DORA = 5,
+	HLT = 6,
+	IN = 7,
+	INC = 8,
+	JA = 9,
+	JAE = 10,
+	JB = 11,
+	JBE = 12,
+	JE = 13,
+	JMP = 14,
+	JNE = 15,
+	MUL = 16,
+	OUT = 17,
+	OUTC = 18,
+	POP_MEMORY_INT = 19,
+	POP_MEMORY_REGISTER = 20,
+	POP_REGISTER = 21,
+	PUSH_MEMORY_INT = 22,
+	PUSH_MEMORY_REGISTER = 23,
+	PUSH_NUMBER = 24,
+	PUSH_REGISTER = 25,
+	RET = 26,
+	RND = 27,
+	SQRT = 28,
+	SUB = 29,
 
 	UNKNOWN = 1488,
 };
 
 enum ArgTypes
 {
-    ATYPE_VOID,
-    ATYPE_INT,
-    ATYPE_REGISTER,
-    ATYPE_LABEL,
+	ATYPE_VOID,
+	ATYPE_INT,
+	ATYPE_REGISTER,
+	ATYPE_LABEL,
+	ATYPE_MEMORY_INT,
+	ATYPE_MEMORY_REGISTER,
 };
 
 struct Command
@@ -52,7 +60,7 @@ struct Command
     const enum ArgTypes arg2_type;
 };
 
-const size_t N_COMMANDS = 24;
+const size_t N_COMMANDS = 30;
 
 const static struct Command commands[N_COMMANDS] = {
 	{
@@ -76,6 +84,14 @@ const static struct Command commands[N_COMMANDS] = {
         .cmd_str = "CALL",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_LABEL,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = DEC,
+        .cmd_str = "DEC",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_REGISTER,
         .arg2_type = ATYPE_VOID,
     },
 
@@ -108,6 +124,14 @@ const static struct Command commands[N_COMMANDS] = {
         .cmd_str = "IN",
         .cmd_args_count = 0,
         .arg1_type = ATYPE_VOID,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = INC,
+        .cmd_str = "INC",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_REGISTER,
         .arg2_type = ATYPE_VOID,
     },
 
@@ -192,10 +216,42 @@ const static struct Command commands[N_COMMANDS] = {
     },
 
 	{
-        .cmd_num = POP,
+        .cmd_num = POP_MEMORY_INT,
+        .cmd_str = "POP",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_MEMORY_INT,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = POP_MEMORY_REGISTER,
+        .cmd_str = "POP",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_MEMORY_REGISTER,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = POP_REGISTER,
         .cmd_str = "POP",
         .cmd_args_count = 1,
         .arg1_type = ATYPE_REGISTER,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = PUSH_MEMORY_INT,
+        .cmd_str = "PUSH",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_MEMORY_INT,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = PUSH_MEMORY_REGISTER,
+        .cmd_str = "PUSH",
+        .cmd_args_count = 1,
+        .arg1_type = ATYPE_MEMORY_REGISTER,
         .arg2_type = ATYPE_VOID,
     },
 

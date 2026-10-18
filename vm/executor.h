@@ -42,8 +42,9 @@ ExecutorError eabs(VM *vm);
 ExecutorError esqrt(VM *vm);
 
 ExecutorError eout(VM *vm);
+ExecutorError eoutc(VM *vm);
 
-ExecutorError epop(VM *vm);
+ExecutorError epop_register(VM *vm);
 ExecutorError epush_register(VM *vm);
 
 ExecutorError ejmp(VM *vm);
@@ -57,6 +58,14 @@ ExecutorError ein(VM *vm);
 ExecutorError edora(VM *vm);
 
 ExecutorError ernd(VM *vm);
+
+ExecutorError epush_memory_int(VM *vm);
+ExecutorError epush_memory_register(VM *vm);
+ExecutorError epop_memory_int(VM *vm);
+ExecutorError epop_memory_register(VM *vm);
+
+ExecutorError edec(VM *vm);
+ExecutorError einc(VM *vm);
 
 const char *get_exec_error(ExecError error);
 

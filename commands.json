@@ -1,4 +1,12 @@
 {
+  "arg_types": {
+    "ATYPE_VOID": 0,
+    "ATYPE_INT": 1,
+    "ATYPE_REGISTER": 2,
+    "ATYPE_LABEL": 3,
+    "ATYPE_MEMORY_INT": 4,
+    "ATYPE_MEMORY_REGISTER": 5
+  },
   "commands": [
     {
       "cmd_str": "HLT"
@@ -35,7 +43,7 @@
       "cmd_str": "OUT"
     },
     {
-      "cmd_str": "POP",
+      "cmd_str": "POP_REGISTER",
       "cmd_args_count": 1,
       "arg1_type": "ATYPE_REGISTER"
     },
@@ -93,6 +101,36 @@
     },
     {
       "cmd_str": "RND"
+    },
+    {
+      "cmd_str": "PUSH_MEMORY_INT",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_MEMORY_INT"
+    },
+    {
+      "cmd_str": "PUSH_MEMORY_REGISTER",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_MEMORY_REGISTER"
+    },
+    {
+      "cmd_str": "POP_MEMORY_INT",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_MEMORY_INT"
+    },
+    {
+      "cmd_str": "POP_MEMORY_REGISTER",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_MEMORY_REGISTER"
+    },
+    {
+      "cmd_str": "INC",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_REGISTER"
+    },
+    {
+      "cmd_str": "DEC",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_REGISTER"
     }
   ]
 }

@@ -42,10 +42,11 @@ typedef struct VM
     size_t registers_count;
     long long registers[REGISTERS_COUNT];
     size_t IP;
+    long long *RAM;
     struct Command current_command;
 } VM;
 
-VMError init_vm(VM *vm);
+VMError init_vm(VM *vm, long long *ram_p);
 VMError load_program(VM *vm, const char *filename);
 VMError execute_program(VM *vm);
 VMError babah_vm(VM *vm);

@@ -120,7 +120,10 @@ static enum ProcessStringError process_labels(struct ASM *asm_obj)
         enum ProcessStringError error = process_string(&string, &ir, asm_obj);
 
         if (error != PSE_OK && error != PSE_IS_LABEL && error != PSE_EMPTY_STRING)
+        {
+            log("Error while labels processing in line %d", i + 1);
             return error;
+        }
 
         if (error == PSE_OK)
         {
@@ -262,23 +265,36 @@ int get_arg_type(const char *str_arg, enum ArgTypes *arg_type_buf)
         return 0;
     }
 
-    if (is_num(str_arg))
-    {
-        *arg_type_buf = ATYPE_INT;
-        return 0;
-    }
-
     if (str_arg[0] == ':')
     {
         *arg_type_buf = ATYPE_LABEL;
         return 0;
     }
 
+    size_t length = strlen(str_arg);
+    int is_memory = 0;
+    char copy_str[MAX_COMMAND_ARG_LENGTH] = {};
+    strncpy(copy_str, str_arg, MAX_COMMAND_ARG_LENGTH);
+    char *copy_str_p = copy_str;
+
+    if (str_arg[0] == '[' && str_arg[length - 1] == ']')
+    {
+        is_memory = 1;
+        copy_str_p[length - 1] = '\0';
+        copy_str_p++;
+    }
+
+    if (is_num(copy_str_p))
+    {
+        *arg_type_buf = is_memory ? ATYPE_MEMORY_INT : ATYPE_INT;
+        return 0;
+    }
+
     for (size_t i = 0; i < REGISTERS_COUNT; i++)
     {
-        if (!strcmp(str_arg, REGISTERS[i]))
+        if (!strcmp(copy_str_p, REGISTERS[i]))
         {
-            *arg_type_buf = ATYPE_REGISTER;
+            *arg_type_buf = is_memory ? ATYPE_MEMORY_REGISTER : ATYPE_REGISTER;
             return 0;
         }
     }
@@ -337,9 +353,37 @@ static int parse_command_arg(struct ASM *asm_obj, enum ArgTypes arg_type, const 
         return 1;
     }
 
+    case ATYPE_MEMORY_INT:
+    {
+        int res = sscanf(str_arg, "[%d]", arg);
+
+        if (res == 1)
+            break;
+
+        log("Cant parse INT arg from str_arg = %s", str_arg);
+        return 1;
+    }
+
     case ATYPE_REGISTER:
     {
         int reg = get_register(str_arg);
+        if (reg < 0)
+        {
+            log("Get unknown register name: %s", str_arg);
+            return 1;
+        }
+        *arg = reg;
+        break;
+    }
+
+    case ATYPE_MEMORY_REGISTER:
+    {
+        char copy_str[MAX_COMMAND_ARG_LENGTH] = {};
+        strncpy(copy_str, str_arg, MAX_COMMAND_ARG_LENGTH);
+        char *copy_str_p = copy_str + 1;
+        copy_str_p[strlen(copy_str_p) - 1] = '\0';
+
+        int reg = get_register(copy_str_p);
         if (reg < 0)
         {
             log("Get unknown register name: %s", str_arg);

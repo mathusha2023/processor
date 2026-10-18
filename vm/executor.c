@@ -295,7 +295,7 @@ ExecutorError esqrt(VM *vm)
 ExecutorError eout(VM *vm)
 {
     assert(vm);
-    assert(vm->current_command.cmd == OUT || vm->current_command.cmd == OUTC);
+    assert(vm->current_command.cmd == OUT);
 
     ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 
@@ -308,14 +308,7 @@ ExecutorError eout(VM *vm)
         return error;
     }
 
-    if (vm->current_command.cmd == OUT)
-    {
-        printf("%lg\n", (double)value / DELTA);
-    }
-    else
-    {
-        printf("%c", (char)(value / DELTA));
-    }
+    printf("%lg\n", (double)value / DELTA);
 
     FLOG("After out:");
     dump_stack(&vm->stack);
@@ -323,10 +316,34 @@ ExecutorError eout(VM *vm)
     return error;
 }
 
-ExecutorError epop(VM *vm)
+ExecutorError eoutc(VM *vm)
 {
     assert(vm);
-    assert(vm->current_command.cmd == POP);
+    assert(vm->current_command.cmd == OUTC);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    long long value = 0;
+
+    error.stack_error = pop_stack(&vm->stack, &value);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack popping: %s", get_stack_error(error.stack_error));
+        return error;
+    }
+
+    printf("%c", (char)(value / DELTA));
+
+    FLOG("After out:");
+    dump_stack(&vm->stack);
+
+    return error;
+}
+
+ExecutorError epop_register(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == POP_REGISTER);
 
     long long register_num = vm->current_command.arg1;
     assert(0 <= register_num && register_num < (long long)vm->registers_count);
@@ -524,6 +541,120 @@ ExecutorError ernd(VM *vm)
     {
         LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", random_value, get_stack_error(error.stack_error));
     }
+
+    return error;
+}
+
+ExecutorError epush_memory_int(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == PUSH_MEMORY_INT);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    long long mem_addr = vm->current_command.arg1;
+
+    error.stack_error = push_stack(&vm->stack, vm->RAM[mem_addr]);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", vm->RAM[mem_addr], get_stack_error(error.stack_error));
+    }
+
+    return error;
+}
+
+ExecutorError epush_memory_register(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == PUSH_MEMORY_REGISTER);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    long long register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+
+    error.stack_error = push_stack(&vm->stack, vm->RAM[vm->registers[register_num] / DELTA]);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s",
+            vm->RAM[vm->registers[register_num] / DELTA],
+            get_stack_error(error.stack_error));
+    }
+
+    return error;
+}
+
+ExecutorError epop_memory_int(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == POP_MEMORY_INT);
+
+    long long mem_adr = vm->current_command.arg1;
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    long long value = 0;
+
+    error.stack_error = pop_stack(&vm->stack, &value);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack popping value: %s", get_stack_error(error.stack_error));
+        return error;
+    }
+
+    vm->RAM[mem_adr] = value;
+    return error;
+}
+
+ExecutorError epop_memory_register(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == POP_MEMORY_REGISTER);
+
+    long long register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    long long value = 0;
+
+    error.stack_error = pop_stack(&vm->stack, &value);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack popping value: %s", get_stack_error(error.stack_error));
+        return error;
+    }
+
+    vm->RAM[vm->registers[register_num] / DELTA] = value;
+    return error;
+}
+
+ExecutorError edec(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == DEC);
+
+    long long register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    vm->registers[register_num] -= DELTA;
+
+    return error;
+}
+
+ExecutorError einc(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == INC);
+
+    long long register_num = vm->current_command.arg1;
+    assert(0 <= register_num && register_num < (long long)vm->registers_count);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    vm->registers[register_num] += DELTA;
 
     return error;
 }

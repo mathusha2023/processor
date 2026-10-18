@@ -8,9 +8,10 @@ static struct Command get_next_command(VM *vm);
 static off_t get_file_size(FILE *file);
 static inline size_t min(size_t a, size_t b);
 
-VMError init_vm(VM *vm)
+VMError init_vm(VM *vm, long long *ram_p)
 {
     assert(vm);
+    assert(ram_p);
 
     VMError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK, .vm_error = VM_OK};
 
@@ -32,6 +33,7 @@ VMError init_vm(VM *vm)
     }
 
     vm->registers_count = REGISTERS_COUNT;
+    vm->RAM = ram_p;
 
     return error;
 }
@@ -98,7 +100,7 @@ VMError execute_program(VM *vm)
 
         if (error.stack_error || error.executor_error)
         {
-            LOG("ERROR while executing command at line %lu", vm->IP);
+            LOG("ERROR while executing command %lu", vm->IP);
 
             vm_error.stack_error = error.stack_error;
             vm_error.executor_error = error.executor_error;
@@ -137,62 +139,8 @@ VMError babah_vm(VM *vm)
     return error;
 }
 
-ExecutorError execute_command(VM *vm)
-{
-    assert(vm);
-    assert(vm->code);
-    assert(vm->code_length);
-
-    switch (vm->current_command.cmd)
-    {
-    case HLT:
-        return ehlt(vm);
-    case PUSH_NUMBER:
-        return epush_number(vm);
-    case ADD:
-        return eadd(vm);
-    case SUB:
-        return esub(vm);
-    case MUL:
-        return emul(vm);
-    case DIV:
-        return ediv(vm);
-    case ABS:
-        return eabs(vm);
-    case SQRT:
-        return esqrt(vm);
-    case OUT:
-    case OUTC:
-        return eout(vm);
-    case POP:
-        return epop(vm);
-    case PUSH_REGISTER:
-        return epush_register(vm);
-    case JMP:
-        return ejmp(vm);
-    case JA:
-    case JB:
-    case JAE:
-    case JBE:
-    case JE:
-    case JNE:
-        return ejmp_condition(vm);
-    case CALL:
-        return ecall(vm);
-    case RET:
-        return eret(vm);
-    case IN:
-        return ein(vm);
-    case DORA:
-        return edora(vm);
-    case RND:
-        return ernd(vm);
-    default:
-        LOG("ERROR: unknown command while casing executing command");
-        assert(0 && "ПРОИЗОШЕЛ ПОЛНЫЙ БЛЯЗДЕЦ");
-    }
-    return (ExecutorError){.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
-}
+// ExecutorError execute_command(VM *vm);
+#include "command_switch.h"
 
 const char *get_vm_error(VirtualMachineError error)
 {

@@ -12,7 +12,9 @@ int main(int argc, char *argv[])
     VM vm = {};
     VMError error = {};
 
-    error = init_vm(&vm);
+    long long MEMORY[MEMORY_LENGTH] = {};
+
+    error = init_vm(&vm, MEMORY);
     if (error.stack_error || error.executor_error || error.vm_error)
     {
         LOG("Error while init VM");
