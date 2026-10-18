@@ -1,0 +1,98 @@
+{
+  "commands": [
+    {
+      "cmd_str": "HLT"
+    },
+    {
+      "cmd_str": "PUSH_NUMBER",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_INT"
+    },
+    {
+      "cmd_str": "PUSH_REGISTER",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_REGISTER"
+    },
+    {
+      "cmd_str": "ADD"
+    },
+    {
+      "cmd_str": "SUB"
+    },
+    {
+      "cmd_str": "MUL"
+    },
+    {
+      "cmd_str": "DIV"
+    },
+    {
+      "cmd_str": "ABS"
+    },
+    {
+      "cmd_str": "SQRT"
+    },
+    {
+      "cmd_str": "OUT"
+    },
+    {
+      "cmd_str": "POP",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_REGISTER"
+    },
+    {
+      "cmd_str": "JMP",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "JA",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "JB",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "JAE",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "JBE",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "JE",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "JNE",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "CALL",
+      "cmd_args_count": 1,
+      "arg1_type": "ATYPE_LABEL"
+    },
+    {
+      "cmd_str": "RET"
+    },
+    {
+      "cmd_str": "IN"
+    },
+    {
+      "cmd_str": "OUTC"
+    },
+    {
+      "cmd_str": "DORA"
+    },
+    {
+      "cmd_str": "RND"
+    }
+  ]
+}
