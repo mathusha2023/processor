@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <sys/stat.h>
 #include "executor.h"
+#include "murmur3.h"
 
 static struct Command get_next_command(VM *vm);
 static off_t get_file_size(FILE *file);
@@ -63,10 +64,72 @@ VMError load_program(VM *vm, const char *filename)
         return error;
     }
 
-    size_t code_length = (size_t)file_size / sizeof(vm_el_t);
+    // magic numbers
+    char magic_numbers_arr[MAGIC_LENGTH] = {};
+    size_t read_count = fread(magic_numbers_arr, sizeof(char), MAGIC_LENGTH, file);
+    if (read_count != MAGIC_LENGTH)
+    {
+        LOG("Error while reading program file %s: read %lu bytes but %lu expected", filename, read_count, MAGIC_LENGTH);
+        fclose(file);
+        error.vm_error = VM_ERROR_READING_FILE;
+        return error;
+    }
+    for (size_t i = 0; i < MAGIC_LENGTH; i++)
+    {
+        if (magic_numbers_arr[i] != MAGIC[i])
+        {
+            LOG("File header magic numbers are not same!");
+            fclose(file);
+            error.vm_error = VM_BAD_MAGIC_NUMBERS;
+            return error;
+        }
+    }
 
-    size_t read_count = fread(vm->code, sizeof(vm_el_t), min(code_length, MAX_CODE_LENGTH), file);
+    // version
+    char version_arr[VERSION_LENGTH] = {};
+    read_count = fread(version_arr, sizeof(char), VERSION_LENGTH, file);
+    if (read_count != VERSION_LENGTH)
+    {
+        LOG("Error while reading program file %s: read %lu bytes but %lu expected", filename, read_count, VERSION_LENGTH);
+        fclose(file);
+        error.vm_error = VM_ERROR_READING_FILE;
+        return error;
+    }
+    for (size_t i = 0; i < VERSION_LENGTH; i++)
+    {
+        if (version_arr[i] > VERSION[i])
+        {
+            LOG("File version is higher than vm can execute!");
+            fclose(file);
+            error.vm_error = VM_HIGHER_VERSION;
+            return error;
+        }
+    }
 
+    // code length
+    uint32_t code_length = 0;
+    read_count = fread(&code_length, sizeof(code_length), 1, file);
+    if (read_count != 1)
+    {
+        LOG("Error while reading program file %s: read %lu bytes but %lu expected", filename, read_count, 1);
+        fclose(file);
+        error.vm_error = VM_ERROR_READING_FILE;
+        return error;
+    }
+
+    // hash
+    uint32_t code_file_hash = 0;
+    read_count = fread(&code_file_hash, sizeof(code_file_hash), 1, file);
+    if (read_count != 1)
+    {
+        LOG("Error while reading program file %s: read %lu bytes but %lu expected", filename, read_count, 1);
+        fclose(file);
+        error.vm_error = VM_ERROR_READING_FILE;
+        return error;
+    }
+
+    // code
+    read_count = fread(vm->code, sizeof(vm_el_t), min(code_length, MAX_CODE_LENGTH), file);
     if (read_count != code_length)
     {
         LOG("Error while reading program file %s: read %lu commands but %lu expected", filename, read_count, code_length);
@@ -75,9 +138,18 @@ VMError load_program(VM *vm, const char *filename)
         return error;
     }
 
-    vm->code_length = code_length;
-
     fclose(file);
+
+    uint32_t code_real_hash = 0;
+    MurmurHash3_x86_32(vm->code, (int)(code_length * sizeof(vm_el_t)), SEED, &code_real_hash);
+    if (code_file_hash != code_real_hash)
+    {
+        LOG("Error: file hash and read hash are not equal!");
+        error.vm_error = VM_INVALID_HASH;
+        return error;
+    }
+
+    vm->code_length = code_length;
 
     return error;
 }

@@ -16,6 +16,9 @@ typedef enum VirtualMachineError
     VM_CANT_GET_FILE_SIZE,
     VM_ERROR_READING_FILE,
     VM_ERROR_EXECUTE_COMMAND,
+    VM_BAD_MAGIC_NUMBERS,
+    VM_HIGHER_VERSION,
+    VM_INVALID_HASH,
 } VirtualMachineError;
 
 static const char *STR_VM_ERRORS[] = {
@@ -24,6 +27,9 @@ static const char *STR_VM_ERRORS[] = {
     "VM_CANT_GET_FILE_SIZE",
     "VM_ERROR_READING_FILE",
     "VM_ERROR_EXECUTE_COMMAND",
+    "VM_BAD_MAGIC_NUMBERS",
+    "VM_HIGHER_VERSION",
+    "VM_INVALID_HASH",
 };
 
 typedef struct VMError

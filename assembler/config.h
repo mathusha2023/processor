@@ -24,6 +24,13 @@ typedef int asm_el_t;
         p = NULL;   \
     }
 
+// .baa format header
+const size_t MAGIC_LENGTH = 4;
+const char MAGIC[MAGIC_LENGTH] = {'D', 'O', 'R', 'A'};
+const size_t VERSION_LENGTH = 2;
+const char VERSION[VERSION_LENGTH] = {0, 1};
+const uint32_t SEED = 52;
+
 const char DEFAULT_INPUT_FILE_NAME[] = "program.txt";
 const char DEFAULT_OUTPUT_FILE_NAME[] = "res.baa";
 const char DEFAULT_DEBUG_OUTPUT_FILE_NAME[] = "res-debug.baa.txt";

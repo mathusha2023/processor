@@ -23,6 +23,13 @@ const char VM_EL_SPECIFICATOR[] = "%d";
         p = NULL;   \
     }
 
+// .baa format header
+const size_t MAGIC_LENGTH = 4;
+const char MAGIC[MAGIC_LENGTH] = {'D', 'O', 'R', 'A'};
+const size_t VERSION_LENGTH = 2;
+const char VERSION[VERSION_LENGTH] = {0, 1};
+const uint32_t SEED = 52;
+
 const char LOGFILE_NAME[] = "log.txt";
 const char DEFAULT_PROGRAM_FILE_NAME[] = "../assembler/res.baa";
 const double EPSILON = 1e-6;

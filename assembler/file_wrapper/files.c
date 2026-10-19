@@ -9,6 +9,7 @@
 #include "config.h"
 #include "log.h"
 #include "my_string.h"
+#include "murmur3.h"
 #include "file_wrapper.h"
 
 // устанавливает поля wrapper->file_size, wrapper->buffer, wrapper->file_n_symb
@@ -180,8 +181,47 @@ int write_bin(const char *filename, void *arr, size_t el_size, size_t arr_size)
         log("Cant open file %s: %d", filename, error);
         return errno;
     }
+    // Magic numbers
+    size_t written = fwrite(MAGIC, sizeof(MAGIC[0]), MAGIC_LENGTH, file);
+    if (written != MAGIC_LENGTH)
+    {
+        int error = errno;
+        log("Error while writing magic numbers in file %s: %d", filename, error);
+        return error;
+    }
 
-    size_t written = fwrite(arr, el_size, arr_size, file);
+    // version
+    written = fwrite(VERSION, sizeof(VERSION[0]), VERSION_LENGTH, file);
+    if (written != VERSION_LENGTH)
+    {
+        int error = errno;
+        log("Error while writing version in file %s: %d", filename, error);
+        return error;
+    }
+
+    // code size - 4 byte
+    uint32_t int_arr_size = (uint32_t)arr_size;
+    written = fwrite(&int_arr_size, sizeof(int_arr_size), 1, file);
+    if (written != 1)
+    {
+        int error = errno;
+        log("Error while writing code size in file %s: %d", filename, error);
+        return error;
+    }
+
+    // hash
+    uint32_t hash = 0;
+    MurmurHash3_x86_32(arr, (int)(arr_size * el_size), SEED, &hash);
+    written = fwrite(&hash, sizeof(hash), 1, file);
+    if (written != 1)
+    {
+        int error = errno;
+        log("Error while writing hash in file %s: %d", filename, error);
+        return error;
+    }
+
+    // code
+    written = fwrite(arr, el_size, arr_size, file);
     if (written != arr_size)
     {
         int error = errno;
