@@ -158,11 +158,13 @@ ExecutorError emul(VM *vm)
         return error;
     }
 
+    long long res = (long long)x * (long long)y / DELTA;
+
     // деление на дельту во время пуша чтобы поддерживать точность
-    error.stack_error = push_stack(&vm->stack, x * y / DELTA);
+    error.stack_error = push_stack(&vm->stack, (vm_el_t)res);
     if (error.stack_error != STACK_OK)
     {
-        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", x * y / DELTA, get_stack_error(error.stack_error));
+        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", (vm_el_t)res, get_stack_error(error.stack_error));
     }
 
     FLOG("After mult:");
@@ -208,10 +210,12 @@ ExecutorError ediv(VM *vm)
         return error;
     }
 
-    error.stack_error = push_stack(&vm->stack, x * DELTA / y);
+    long long res = (long long)x * DELTA / y;
+
+    error.stack_error = push_stack(&vm->stack, (vm_el_t)res);
     if (error.stack_error != STACK_OK)
     {
-        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", x * DELTA / y, get_stack_error(error.stack_error));
+        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", (vm_el_t)res, get_stack_error(error.stack_error));
     }
 
     FLOG("After div:");

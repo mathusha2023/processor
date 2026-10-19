@@ -1,0 +1,329 @@
+    CALL :write_a_coeff_hint
+    IN
+    POP AX
+
+    CALL :write_b_coeff_hint
+    IN 
+    POP BX
+
+    CALL :write_c_coeff_hint
+    IN 
+    POP CX
+
+    PUSH AX 
+    PUSH 0
+    JE :solve_linear_zalupa
+
+    CALL :count_d
+
+    PUSH DX 
+    PUSH 0
+    JB :d<0bl
+
+    PUSH DX 
+    PUSH 0
+    JE :d=0bl 
+
+    JMP :d>0bl    
+
+    JMP :exit
+
+:count_d
+    PUSH BX 
+    PUSH BX 
+    MUL
+    PUSH 4
+    PUSH AX 
+    PUSH CX 
+    MUL 
+    MUL 
+    SUB
+    POP DX
+    RET
+
+:d<0bl 
+    CALL :write_roots_count_hint
+    PUSH 0
+    OUT
+    JMP :exit
+
+:d=0bl
+    CALL :write_roots_count_hint
+    PUSH 1
+    OUT 
+
+    PUSH BX 
+    PUSH -1
+    MUL 
+    PUSH AX 
+    PUSH 2
+    MUL
+    DIV
+
+    CALL :write_root_hint
+    OUT
+
+    JMP :exit
+
+:d>0bl 
+    CALL :write_roots_count_hint
+    PUSH 2
+    OUT 
+
+    PUSH DX 
+    SQRT
+    POP GX
+
+    PUSH BX 
+    PUSH -1
+    MUL 
+    PUSH GX 
+    SUB 
+    PUSH 2
+    PUSH AX 
+    MUL 
+    DIV
+
+    PUSH BX 
+    PUSH -1
+    MUL 
+    PUSH GX 
+    ADD
+    PUSH 2
+    PUSH AX 
+    MUL 
+    DIV
+
+    CALL :write_roots_hint
+    OUT
+    OUT 
+
+    JMP :exit
+
+
+:solve_linear_zalupa
+        PUSH BX 
+        PUSH 0
+        JE :b_is_0
+
+        CALL :write_roots_count_hint
+        PUSH 1
+        OUT 
+
+        PUSH -1
+        PUSH CX 
+        MUL 
+        PUSH BX 
+        DIV
+
+        CALL :write_root_hint
+        OUT
+
+        JMP :exit
+
+    :b_is_0
+        PUSH CX 
+        PUSH 0
+        JE :c_is_0
+        JMP :c_isnt_0
+
+    :c_is_0 
+        CALL :write_roots_count_hint
+        CALL :write_infinity
+        JMP :exit
+
+    :c_isnt_0
+        CALL :write_roots_count_hint
+        PUSH 0
+        OUT
+        JMP :exit
+        
+:exit
+    HLT
+
+:write_a_coeff_hint
+    PUSH 69
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 97
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 99
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 102
+    OUTC
+    PUSH 102
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 10
+    OUTC
+    RET
+
+:write_b_coeff_hint
+    PUSH 69
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 98
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 99
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 102
+    OUTC
+    PUSH 102
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 10
+    OUTC
+    RET
+
+:write_c_coeff_hint
+    PUSH 69
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 114
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 99
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 99
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 101
+    OUTC
+    PUSH 102
+    OUTC
+    PUSH 102
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 10
+    OUTC
+    RET
+
+:write_roots_count_hint
+    PUSH 82
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 115
+    OUTC
+    PUSH 32
+    OUTC
+    PUSH 99
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 117
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 32
+    OUTC
+    RET
+
+:write_roots_hint
+    PUSH 82
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 115
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 10
+    OUTC
+    RET
+
+:write_root_hint
+    PUSH 82
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 111
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 58
+    OUTC
+    PUSH 32
+    OUTC
+    RET
+
+:write_infinity
+    PUSH 105
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 102
+    OUTC
+    PUSH 105
+    OUTC
+    PUSH 110
+    OUTC
+    PUSH 105
+    OUTC
+    PUSH 116
+    OUTC
+    PUSH 121
+    OUTC
+    PUSH 10
+    OUTC
+    RET

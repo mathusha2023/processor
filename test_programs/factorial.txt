@@ -7,11 +7,9 @@
     PUSH 0
     JB :incorrect_input_exit
 
-    PUSH 1
-    POP DX ; инициализируем произведение единицей
-
     CALL :factorial
     CALL :your_answer_text
+    PUSH DX
     OUT
 
     JMP :exit
@@ -19,27 +17,26 @@
 ; Ниже идут функции
 
 ; в AX передаем текущее значение n, 
-; в DX - текущее произведение
-; в конце работы результат будет в стэке и в DX
+; в конце работы результат будет в DX
 :factorial 
         PUSH AX 
         PUSH 1
-        JBE :factorial_return
+        JBE :base_factorial
 
         PUSH AX
+        DEC AX
+
+        CALL :factorial
+
         PUSH DX 
         MUL
         POP DX 
 
-        PUSH AX 
+        RET
+
+    :base_factorial
         PUSH 1
-        SUB
-        POP AX
-
-        CALL :factorial
-
-    :factorial_return
-        PUSH DX
+        POP DX
         RET
 
 :incorrect_input_exit
