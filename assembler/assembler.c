@@ -415,8 +415,6 @@ static int parse_command_arg(struct ASM *asm_obj, enum ArgTypes arg_type, const 
     return 0;
 }
 
-// ВОЗМОЖЕН БАГ - НА КОНЦЕ str_register БУДЕТ ПЕРЕВОД СТРОКИ И СРАВНЕНИЕ НЕ СРАБОТАЕТ,
-// но это не точно)
 static int get_register(const char *str_register)
 {
     assert(str_register);

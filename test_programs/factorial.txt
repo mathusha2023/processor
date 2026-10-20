@@ -1,3 +1,5 @@
+    ; Программа вычисляющая факториал числа
+    
     CALL :enter_your_number_text
     IN ; число факториал которого мы берем
     POP AX
@@ -23,11 +25,14 @@
         PUSH 1
         JBE :base_factorial
 
-        PUSH AX
+        PUSH AX ; сохранить значение n в стеке
         DEC AX
 
         CALL :factorial
 
+        POP AX ; вернуть AX ее значение, которое было передано
+
+        PUSH AX
         PUSH DX 
         MUL
         POP DX 
