@@ -39,6 +39,7 @@ ExecutorError emul(VM *vm);
 ExecutorError ediv(VM *vm);
 
 ExecutorError eabs(VM *vm);
+ExecutorError esqr(VM *vm);
 ExecutorError esqrt(VM *vm);
 
 ExecutorError eout(VM *vm);
@@ -66,6 +67,8 @@ ExecutorError epop_memory_register(VM *vm);
 
 ExecutorError edec(VM *vm);
 ExecutorError einc(VM *vm);
+
+ExecutorError edmp(VM *vm);
 
 const char *get_exec_error(ExecError error);
 

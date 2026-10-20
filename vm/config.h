@@ -27,7 +27,7 @@ const char VM_EL_SPECIFICATOR[] = "%d";
 const size_t MAGIC_LENGTH = 4;
 const char MAGIC[MAGIC_LENGTH] = {'D', 'O', 'R', 'A'};
 const size_t VERSION_LENGTH = 2;
-const char VERSION[VERSION_LENGTH] = {1, 1};
+const char VERSION[VERSION_LENGTH] = {1, 2};
 const uint32_t SEED = 52;
 
 const char LOGFILE_NAME[] = "log.txt";

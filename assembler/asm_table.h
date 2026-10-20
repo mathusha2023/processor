@@ -12,31 +12,33 @@ enum Commands
 	CALL = 2,
 	DEC = 3,
 	DIV = 4,
-	DORA = 5,
-	HLT = 6,
-	IN = 7,
-	INC = 8,
-	JA = 9,
-	JAE = 10,
-	JB = 11,
-	JBE = 12,
-	JE = 13,
-	JMP = 14,
-	JNE = 15,
-	MUL = 16,
-	OUT = 17,
-	OUTC = 18,
-	POP_MEMORY_INT = 19,
-	POP_MEMORY_REGISTER = 20,
-	POP_REGISTER = 21,
-	PUSH_MEMORY_INT = 22,
-	PUSH_MEMORY_REGISTER = 23,
-	PUSH_NUMBER = 24,
-	PUSH_REGISTER = 25,
-	RET = 26,
-	RND = 27,
-	SQRT = 28,
-	SUB = 29,
+	DMP = 5,
+	DORA = 6,
+	HLT = 7,
+	IN = 8,
+	INC = 9,
+	JA = 10,
+	JAE = 11,
+	JB = 12,
+	JBE = 13,
+	JE = 14,
+	JMP = 15,
+	JNE = 16,
+	MUL = 17,
+	OUT = 18,
+	OUTC = 19,
+	POP_MEMORY_INT = 20,
+	POP_MEMORY_REGISTER = 21,
+	POP_REGISTER = 22,
+	PUSH_MEMORY_INT = 23,
+	PUSH_MEMORY_REGISTER = 24,
+	PUSH_NUMBER = 25,
+	PUSH_REGISTER = 26,
+	RET = 27,
+	RND = 28,
+	SQR = 29,
+	SQRT = 30,
+	SUB = 31,
 
 	UNKNOWN = 1488,
 };
@@ -60,7 +62,7 @@ struct Command
     const enum ArgTypes arg2_type;
 };
 
-const size_t N_COMMANDS = 30;
+const size_t N_COMMANDS = 32;
 
 const static struct Command commands[N_COMMANDS] = {
 	{
@@ -98,6 +100,14 @@ const static struct Command commands[N_COMMANDS] = {
 	{
         .cmd_num = DIV,
         .cmd_str = "DIV",
+        .cmd_args_count = 0,
+        .arg1_type = ATYPE_VOID,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = DMP,
+        .cmd_str = "DMP",
         .cmd_args_count = 0,
         .arg1_type = ATYPE_VOID,
         .arg2_type = ATYPE_VOID,
@@ -282,6 +292,14 @@ const static struct Command commands[N_COMMANDS] = {
 	{
         .cmd_num = RND,
         .cmd_str = "RND",
+        .cmd_args_count = 0,
+        .arg1_type = ATYPE_VOID,
+        .arg2_type = ATYPE_VOID,
+    },
+
+	{
+        .cmd_num = SQR,
+        .cmd_str = "SQR",
         .cmd_args_count = 0,
         .arg1_type = ATYPE_VOID,
         .arg2_type = ATYPE_VOID,

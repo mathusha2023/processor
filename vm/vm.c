@@ -234,7 +234,6 @@ static struct Command get_next_command(VM *vm)
     assert(vm->IP < vm->code_length);
     enum Commands cmd = (enum Commands)vm->code[vm->IP++];
 
-    assert(cmd < N_COMMANDS);
     struct Command const_command = commands[cmd];
     assert(cmd == const_command.cmd);
 

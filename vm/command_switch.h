@@ -21,6 +21,8 @@ ExecutorError execute_command(VM *vm)
 		return edec(vm);
 	case DIV:
 		return ediv(vm);
+	case DMP:
+		return edmp(vm);
 	case DORA:
 		return edora(vm);
 	case HLT:
@@ -67,6 +69,8 @@ ExecutorError execute_command(VM *vm)
 		return eret(vm);
 	case RND:
 		return ernd(vm);
+	case SQR:
+		return esqr(vm);
 	case SQRT:
 		return esqrt(vm);
 	case SUB:

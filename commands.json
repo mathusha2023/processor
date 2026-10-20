@@ -131,6 +131,12 @@
       "cmd_str": "DEC",
       "cmd_args_count": 1,
       "arg1_type": "ATYPE_REGISTER"
+    },
+    {
+      "cmd_str": "DMP"
+    },
+    {
+      "cmd_str": "SQR"
     }
   ]
 }

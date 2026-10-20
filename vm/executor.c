@@ -255,6 +255,36 @@ ExecutorError eabs(VM *vm)
     return error;
 }
 
+ExecutorError esqr(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == SQR);
+
+    ExecutorError error = {.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
+
+    vm_el_t x = 0;
+
+    error.stack_error = pop_stack(&vm->stack, &x);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack popping value : %s", get_stack_error(error.stack_error));
+        return error;
+    }
+
+    long long res = (long long)x * (long long)x / DELTA;
+
+    error.stack_error = push_stack(&vm->stack, (vm_el_t)res);
+    if (error.stack_error != STACK_OK)
+    {
+        LOG("Error in stack pushing value " STACK_EL_SPECIFICATOR ": %s", (vm_el_t)res, get_stack_error(error.stack_error));
+    }
+
+    FLOG("After sqr:");
+    dump_stack(&vm->stack);
+
+    return error;
+}
+
 ExecutorError esqrt(VM *vm)
 {
     assert(vm);
@@ -661,6 +691,28 @@ ExecutorError einc(VM *vm)
     vm->registers[register_num] += DELTA;
 
     return error;
+}
+
+ExecutorError edmp(VM *vm)
+{
+    assert(vm);
+    assert(vm->current_command.cmd == DMP);
+
+    size_t ram_linear_size = (size_t)sqrt(MEMORY_LENGTH);
+
+    for (size_t y = 0; y < ram_linear_size; y++)
+    {
+        for (size_t x = 0; x < ram_linear_size; x++)
+        {
+            size_t ind = y * ram_linear_size + x;
+            assert(ind < MEMORY_LENGTH);
+
+            printf("%c", vm->RAM[ind] ? '@' : ' ');
+        }
+        printf("\n");
+    }
+
+    return (ExecutorError){.stack_error = STACK_OK, .executor_error = EXECUTOR_OK};
 }
 
 const char *get_exec_error(ExecError error)
