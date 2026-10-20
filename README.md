@@ -88,6 +88,46 @@ python3 generate_tables.py
 
 ---
 
+## Запуск 
+Склонируйте репозиторий с проектом 
+
+```
+git clone https://github.com/mathusha2023/processor
+```
+
+Перейдите в папку с копией проекта
+
+```
+cd processor
+```
+
+Скомпилируйте ассемблер и процессор
+
+``` 
+cd assembler
+chmod +x ./build.sh
+./build.sh
+
+cd ../vm
+chmod +x ./build.sh
+./build.sh
+cd ..
+```
+
+Ассемблирование запускается командой
+
+```
+assembler/asm <path-to-file>
+```
+
+После этого скомпилированный файл (res.baa) запускается с помощью
+
+```
+vm/vm <path-to-compile-file/res.baa>
+```
+
+---
+
 ## Примеры программ на ассемблере
 <details>
 <summary>Факториал числа</summary>
