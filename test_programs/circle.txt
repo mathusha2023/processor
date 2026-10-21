@@ -1,0 +1,60 @@
+    ; Программа рисующая кружок в консоли
+    
+    PUSH 13 ; корень из размера оперативки
+    POP CX
+    PUSH 6 ; радиус круга
+    POP DX
+
+; EX - счетчик внешнего цикла, FX - внутреннего
+:external_loop
+    PUSH 0
+    POP FX 
+
+    :internal_loop
+
+        CALL :put_symb
+
+        INC FX 
+        PUSH FX
+        PUSH CX
+        JB :internal_loop
+
+    INC EX 
+    PUSH EX 
+    PUSH CX 
+    JB :external_loop
+
+DMP
+HLT
+
+; в EX и FX - координаты y и x соответственно 
+; в DX - радиус круга
+:put_symb
+    PUSH EX 
+    PUSH DX 
+    SUB 
+    SQR
+
+    PUSH FX
+    PUSH DX 
+    SUB 
+    SQR
+
+    ADD 
+    PUSH DX 
+    SQR
+    JBE :in_circle
+    RET
+
+:in_circle
+    ; вычисляем текущий индекс и кладем в AX
+    PUSH CX
+    PUSH EX 
+    MUL 
+    PUSH FX 
+    ADD
+    POP AX
+
+    PUSH 1
+    POP [AX]
+    RET 
