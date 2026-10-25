@@ -1,0 +1,103 @@
+    ; Программа рисующая крук в консоли без использования DMP (исключительно циклами)
+    
+    PUSH 25
+    POP CX
+    PUSH 12
+    POP DX
+
+; EX - счетчик внешнего цикла, FX - внутреннего
+:external_loop
+    PUSH 0
+    POP FX 
+
+    :internal_loop
+
+        ; вычисляем текущий индекс и кладем в AX
+        PUSH CX
+        PUSH EX 
+        MUL 
+        PUSH FX 
+        ADD
+        POP AX
+
+        CALL :put_symb
+
+        INC FX 
+        PUSH FX
+        PUSH CX
+        JB :internal_loop
+
+    INC EX 
+    PUSH EX 
+    PUSH CX 
+    JB :external_loop
+
+    PUSH 0
+    POP EX
+
+; EX - счетчик внешнего цикла, FX - внутреннего
+:print_external_loop
+    PUSH 0
+    POP FX 
+
+    :print_internal_loop
+
+        ; вычисляем текущий индекс и кладем в AX
+        PUSH CX
+        PUSH EX 
+        MUL 
+        PUSH FX 
+        ADD
+        POP AX
+
+        PUSH [AX]
+        OUTC
+
+        INC FX 
+        PUSH FX
+        PUSH CX
+        JB :print_internal_loop
+
+    PUSH 10  ; '\n'
+    OUTC
+
+    INC EX 
+    PUSH EX 
+    PUSH CX 
+    JB :print_external_loop
+
+    HLT
+
+; в EX и FX - координаты y и x соответственно 
+; в DX - радиус круга
+:put_symb
+    PUSH EX 
+    PUSH DX 
+    SUB 
+    SQR
+    PUSH 3
+    MUL
+
+    PUSH FX
+    PUSH DX 
+    SUB 
+    SQR
+
+    ADD 
+    PUSH DX 
+    SQR
+    JBE :in_circle
+    JMP :out_circle
+    RET
+
+:in_circle
+
+    PUSH 64 ; '@'
+    POP [AX]
+    RET 
+
+:out_circle
+
+    PUSH 32 ; ' '
+    POP [AX]
+    RET

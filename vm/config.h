@@ -39,6 +39,6 @@ const vm_el_t DELTA = 1000;
 
 const size_t MAX_COMMAND_LENGTH = 100;
 const size_t MAX_CODE_LENGTH = 1000;
-const size_t MEMORY_LENGTH = 169;
+const size_t MEMORY_LENGTH = 625;
 
 #endif // CONFIG_H

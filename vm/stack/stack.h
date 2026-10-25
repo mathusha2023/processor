@@ -6,7 +6,7 @@
 #include "log.h"
 
 // раскомментировать для отключения режима отладки стэка
-// #define NSTKDEBUG
+#define NSTKDEBUG
 
 // значения которые по сути и задают полное поведение стэка
 #define STACK_EL_TYPE int
