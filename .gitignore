@@ -11,3 +11,5 @@ assembler/assembler
 program.txt
 *.baa
 *.baa.txt
+html/
+latex/
